@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最后通牒者实验 - 虚拟币版本</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #e63946;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 0;
+            box-shadow: none;
+            width: 100%;
+            height: 100vh;
+            max-width: none;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .screen {
+            padding: 40px;
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .center-content {
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 30px;
+            font-size: 3rem;
+            position: relative;
+            padding-bottom: 20px;
+        }
+        
+        h1:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 5px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        h2 {
+            color: var(--secondary);
+            margin-bottom: 25px;
+            font-size: 2.5rem;
+        }
+        
+        .instructions {
+            background: var(--light);
+            padding: 35px;
+            border-radius: 20px;
+            margin: 35px 0;
+            text-align: left;
+            font-size: 1.4rem;
+            line-height: 1.8;
+            border-left: 6px solid var(--primary);
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .input-group {
+            margin: 35px 0;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            font-size: 1.4rem;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            text-align: center;
+            margin: 15px 0;
+            transition: all 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.2);
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.4rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 15px;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-accept {
+            background: var(--success);
+        }
+        
+        .btn-reject {
+            background: var(--danger);
+        }
+        
+        .btn-accept:hover {
+            background: #3aa8d5;
+        }
+        
+        .btn-reject:hover {
+            background: #c1121f;
+        }
+        
+        .response-keys {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .key {
+            padding: 20px 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            font-weight: bold;
+            min-width: 200px;
+            font-size: 1.3rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .proposal-display {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 40px 0;
+            font-size: 2.5rem;
+            font-weight: bold;
+            border: 4px solid var(--primary);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .feedback {
+            background: var(--light);
+            padding: 35px;
+            border-radius: 20px;
+            margin: 35px 0;
+            font-size: 2rem;
+            font-weight: bold;
+            border-left: 6px solid var(--primary);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .network-connecting {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 40px 0;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        .progress-container {
+            width: 100%;
+            max-width: 800px;
+            background: #e9ecef;
+            border-radius: 12px;
+            margin: 30px auto;
+            height: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .trial-counter {
+            background: var(--light);
+            padding: 15px 30px;
+            border-radius: 25px;
+            display: inline-block;
+            margin: 20px 0;
+            font-weight: bold;
+            color: var(--dark);
+            font-size: 1.3rem;
+        }
+        
+        .cross {
+            font-size: 6rem;
+            margin: 40px 0;
+            color: var(--dark);
+        }
+        
+        .image-container {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: #000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .trial-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .fairness-scale {
+            margin: 40px 0;
+            padding: 30px;
+            background: var(--light);
+            border-radius: 20px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .scale-options {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .scale-option {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .scale-option input {
+            margin: 15px 0;
+            transform: scale(1.8);
+        }
+        
+        .scale-option label {
+            font-size: 1.2rem;
+        }
+        
+        .data-display {
+            background: var(--light);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 25px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            text-align: left;
+            font-size: 1.1rem;
+        }
+        
+        .space-hint {
+            margin-top: 30px;
+            color: #6c757d;
+            font-size: 1.2rem;
+        }
+        
+        @media (max-width: 1200px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            h2 {
+                font-size: 2rem;
+            }
+            
+            .instructions {
+                font-size: 1.2rem;
+                padding: 25px;
+            }
+            
+            .proposal-display {
+                font-size: 2rem;
+                padding: 30px;
+            }
+            
+            .key {
+                min-width: 180px;
+                font-size: 1.2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+            }
+            
+            .screen {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.7rem;
+            }
+            
+            .proposal-display {
+                font-size: 1.7rem;
+                padding: 20px;
+            }
+            
+            .response-keys {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .key {
+                width: 100%;
+                max-width: 300px;
+                font-size: 1.1rem;
+            }
+            
+            .btn {
+                padding: 15px 30px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 屏幕1: 参与者编号输入 -->
+        <div id="screen1" class="screen active">
+            <div class="center-content">
+                <h1>最后通牒者实验</h1>
+                <div class="instructions">
+                    <p>欢迎参加本次心理学实验！本研究旨在探索人们在资源分配情境中的决策行为。</p>
+                </div>
+                <div class="input-group">
+                    <p>请输入您的实验编号：</p>
+                    <input type="text" id="participant-id" placeholder="例如: P001">
+                </div>
+                <button class="btn" onclick="startInstructions()">开始实验</button>
+                <p class="space-hint">提示：在实验过程中，您可以使用空格键继续</p>
+            </div>
+        </div>
+        
+        <!-- 屏幕2: 实验说明 -->
+        <div id="screen2" class="screen">
+            <div class="center-content">
+                <h1>实验说明</h1>
+                <div class="instructions">
+                    <p>在本实验中，您将与另一位参与者配对进行一项资源分配任务。</p>
+                    <p>对方将获得10个虚拟币，并决定如何分配这些虚拟币。</p>
+                    <p>对方会提出一个分配方案（例如：对方得到5虚拟币，您得到5虚拟币）。</p>
+                    <p>您的任务是决定是否接受这个分配方案：</p>
+                    <div class="response-keys">
+                        <div class="key">按 <strong>F</strong> 键接受提议</div>
+                        <div class="key">按 <strong>J</strong> 键拒绝提议</div>
+                    </div>
+                    <p>如果您接受提议，双方将按照提议获得虚拟币。</p>
+                    <p>如果您拒绝提议，双方都将得到0虚拟币。</p>
+                </div>
+                <button class="btn" onclick="startNetwork()">理解，继续</button>
+                <p class="space-hint">按空格键继续</p>
+            </div>
+        </div>
+        
+        <!-- 屏幕3: 网络连接 -->
+        <div id="screen3" class="screen">
+            <div class="center-content">
+                <h1>正在连接服务器...</h1>
+                <div class="network-connecting">● ● ●</div>
+                <p>请稍候，正在为您匹配参与者...</p>
+            </div>
+        </div>
+        
+        <!-- 屏幕4: 匹配成功 -->
+        <div id="screen4" class="screen">
+            <div class="center-content">
+                <h1>匹配成功！</h1>
+                <div class="instructions">
+                    <p>您已与 <span id="matched-participant" style="color: var(--primary); font-weight: bold;">XX</span> 号参与者连接成功！</p>
+                </div>
+                <button class="btn" onclick="startPractice()">开始练习</button>
+                <p class="space-hint">按空格键继续</p>
+            </div>
+        </div>
+        
+        <!-- 屏幕5: 练习阶段 -->
+        <div id="screen5" class="screen">
+            <div class="center-content">
+                <h2>练习阶段</h2>
+                <div class="trial-counter">练习试次</div>
+                <div class="proposal-display" id="practice-proposal">
+                    对方得到: 5虚拟币<br>
+                    您得到: 5虚拟币
+                </div>
+                <p>请做出决定：</p>
+                <div class="response-keys">
+                    <button class="btn btn-accept" onclick="practiceDecision('accept')">接受 (F键)</button>
+                    <button class="btn btn-reject" onclick="practiceDecision('reject')">拒绝 (J键)</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕6: 练习反馈 -->
+        <div id="screen6" class="screen">
+            <div class="center-content">
+                <h2>练习反馈</h2>
+                <div class="feedback" id="practice-feedback">
+                    您接受该提议，对方得到5虚拟币，您得到5虚拟币
+                </div>
+                <p>是否继续练习？</p>
+                <div class="response-keys">
+                    <button class="btn" onclick="startExperiment()">进入正式实验 (空格键)</button>
+                    <button class="btn" onclick="continuePractice()">继续练习 (Q键)</button>
+                </div>
+                <p class="space-hint">按空格键进入正式实验，按Q键继续练习</p>
+            </div>
+        </div>
+        
+        <!-- 屏幕7: 正式实验 -->
+        <div id="screen7" class="screen">
+            <div class="center-content">
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <div class="trial-counter" id="trial-counter">试次 1 / 20</div>
+                
+                <!-- 注视点 -->
+                <div id="fixation">
+                    <div class="cross">+</div>
+                </div>
+                
+                <!-- 分配方案 -->
+                <div id="proposal" style="display: none;">
+                    <h2>对方提议</h2>
+                    <div class="proposal-display" id="trial-proposal">
+                        对方得到: 5虚拟币<br>
+                        您得到: 5虚拟币
+                    </div>
+                    <p>请做出决定：</p>
+                    <div class="response-keys">
+                        <button class="btn btn-accept" onclick="makeDecision('accept')">接受 (F键)</button>
+                        <button class="btn btn-reject" onclick="makeDecision('reject')">拒绝 (J键)</button>
+                    </div>
+                </div>
+                
+                <!-- 反馈 -->
+                <div id="feedback" style="display: none;">
+                    <div class="feedback" id="trial-feedback">
+                        您接受该提议，对方得到5虚拟币，您得到5虚拟币
+                    </div>
+                </div>
+                
+                <!-- 公平性评分 -->
+                <div id="fairness-rating" style="display: none;">
+                    <h2>公平性评价</h2>
+                    <div class="fairness-scale">
+                        <p>您觉得刚才对方提议：</p>
+                        <div class="scale-options">
+                            <div class="scale-option">
+                                <input type="radio" id="fairness1" name="fairness" value="1">
+                                <label for="fairness1">1<br>非常不公平</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" id="fairness2" name="fairness" value="2">
+                                <label for="fairness2">2</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" id="fairness3" name="fairness" value="3">
+                                <label for="fairness3">3</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" id="fairness4" name="fairness" value="4">
+                                <label for="fairness4">4</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" id="fairness5" name="fairness" value="5">
+                                <label for="fairness5">5</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" id="fairness6" name="fairness" value="6">
+                                <label for="fairness6">6</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" id="fairness7" name="fairness" value="7">
+                                <label for="fairness7">7<br>非常公平</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="nextTrial()" style="margin-top: 30px;">继续 (空格键)</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕8: 实验结束 -->
+        <div id="screen8" class="screen">
+            <div class="center-content">
+                <h1>实验结束</h1>
+                <div class="instructions">
+                    <p>感谢您参与本次最后通牒者实验！</p>
+                    <p>您的数据已记录，实验虚拟币将根据您的表现进行计算。</p>
+                    <p>数据已保存，实验结束。</p>
+                    <p>您被分配到：<span id="group-assignment" style="color: var(--primary); font-weight: bold;"></span>组</p>
+                </div>
+                <div id="upload-status" style="margin: 30px 0; padding: 20px; border-radius: 15px; background-color: #e9f7ef; color: #2d5016; display: none; font-size: 1.3rem;">
+                    数据上传成功！
+                </div>
+            </div>
+        </div>
+        
+        <!-- 图片呈现容器 - 独立于其他屏幕 -->
+        <div id="image-presentation" class="image-container" style="display: none;">
+            <img id="trial-image" class="trial-image" src="" alt="实验图片">
+        </div>
+    </div>
+
+    <script>
+        // 实验数据存储
+        const experimentData = {
+            participantId: '',
+            matchedParticipant: 0,
+            practiceTrials: [],
+            trials: [],
+            currentTrial: 0,
+            startTime: null,
+            group: '' // 记录被试被分配到的组别
+        };
+        
+        // 分配方案
+        const proposals = [
+            { other: 5, self: 5 },
+            { other: 6, self: 4 },
+            { other: 7, self: 3 },
+            { other: 8, self: 2 },
+            { other: 9, self: 1 }
+        ];
+        
+        // 图片分组配置 - 使用相对路径
+        const imageGroups = {
+            // 陌生组 - 图片命名为01.jpeg, 02.jpeg, ..., 020.jpg
+            mosheng: {
+                name: "陌生",
+                images: [
+                    '01.jpeg', '02.jpeg', '03.jpeg', '04.jpeg', '05.jpeg',
+                    '06.jpeg', '07.jpeg', '08.jpeg', '09.jpeg', '010.jpeg',
+                    '011.jpeg', '012.jpeg', '013.jpg', '014.jpeg', '015.jpg',
+                    '016.png', '017.jpg', '018.jpeg', '019.jpeg', '020.jpg'
+                ]
+            },
+            // 熟悉组 - 图片命名为1.jpeg, 2.jpeg, ..., 20.jpeg
+            shuxi: {
+                name: "熟悉",
+                images: [
+                    '1.jpeg', '2.jpeg', '3.jpeg', '4.jpeg', '5.jpeg',
+                    '6.jpeg', '7.jpeg', '8.jpeg', '9.jpeg', '10.jpeg',
+                    '11.png', '12.JPG', '13.png', '14.jpeg', '15.jpg',
+                    '16.JPG', '17.jpeg', '18.jpeg', '19.jpeg', '20.jpeg'
+                ]
+            }
+        };
+        
+        // 创建试次序列
+        let trialSequence = [];
+        
+        // 预加载图片
+        function preloadImages(group) {
+            const images = [];
+            for (let i = 0; i < group.images.length; i++) {
+                const img = new Image();
+                img.src = group.images[i];
+                images.push(img);
+            }
+            return images;
+        }
+        
+        // 工具函数：随机打乱数组
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+        
+        // 屏幕切换函数
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+        
+        // 开始实验流程
+        function startInstructions() {
+            const participantId = document.getElementById('participant-id').value;
+            if (!participantId) {
+                alert('请输入您的实验编号');
+                return;
+            }
+            
+            experimentData.participantId = participantId;
+            experimentData.startTime = new Date();
+            
+            // 随机分配被试到图片组
+            const groupKeys = Object.keys(imageGroups);
+            const randomGroupKey = groupKeys[Math.floor(Math.random() * groupKeys.length)];
+            experimentData.group = imageGroups[randomGroupKey];
+            
+            // 预加载图片
+            preloadImages(experimentData.group);
+            
+            // 创建试次序列
+            trialSequence = [];
+            
+            // 复制图片数组并随机打乱
+            const shuffledImages = shuffleArray([...experimentData.group.images]);
+            
+            for (let i = 0; i < 4; i++) {
+                proposals.forEach(proposal => {
+                    // 计算图片索引 (0到19)
+                    const imageIndex = i * 5 + proposals.indexOf(proposal);
+                    trialSequence.push({
+                        ...proposal,
+                        imagePath: shuffledImages[imageIndex],
+                        imageId: imageIndex + 1
+                    });
+                });
+            }
+            
+            // 随机化试次顺序
+            trialSequence = shuffleArray(trialSequence);
+            
+            showScreen('screen2');
+        }
+        
+        function startNetwork() {
+            showScreen('screen3');
+            
+            // 模拟网络连接延迟
+            setTimeout(() => {
+                // 随机生成匹配的参与者编号
+                experimentData.matchedParticipant = Math.floor(Math.random() * 36) + 1;
+                document.getElementById('matched-participant').textContent = experimentData.matchedParticipant;
+                showScreen('screen4');
+            }, 2000);
+        }
+        
+        function startPractice() {
+            showScreen('screen5');
+            // 随机选择一个分配方案用于练习
+            const practiceProposal = proposals[Math.floor(Math.random() * proposals.length)];
+            document.getElementById('practice-proposal').innerHTML = 
+                `对方得到: ${practiceProposal.other}虚拟币<br>您得到: ${practiceProposal.self}虚拟币`;
+            
+            // 存储练习试次数据
+            experimentData.currentPractice = practiceProposal;
+        }
+        
+        function practiceDecision(decision) {
+            const practice = experimentData.currentPractice;
+            let feedbackText = '';
+            
+            if (decision === 'accept') {
+                feedbackText = `您接受该提议，对方得到${practice.other}虚拟币，您得到${practice.self}虚拟币`;
+            } else {
+                feedbackText = `您拒绝该提议，双方都得到0虚拟币`;
+            }
+            
+            document.getElementById('practice-feedback').textContent = feedbackText;
+            
+            // 记录练习试次数据
+            experimentData.practiceTrials.push({
+                proposal: practice,
+                decision: decision,
+                timestamp: new Date()
+            });
+            
+            showScreen('screen6');
+        }
+        
+        function continuePractice() {
+            startPractice();
+        }
+        
+        function startExperiment() {
+            showScreen('screen7');
+            runTrial(0);
+        }
+        
+        function runTrial(trialIndex) {
+            experimentData.currentTrial = trialIndex;
+            const trial = trialSequence[trialIndex];
+            
+            // 更新进度和计数器
+            document.getElementById('progress-bar').style.width = `${(trialIndex + 1) / trialSequence.length * 100}%`;
+            document.getElementById('trial-counter').textContent = `试次 ${trialIndex + 1} / ${trialSequence.length}`;
+            
+            // 更新图片 - 使用相对路径
+            document.getElementById('trial-image').src = trial.imagePath;
+            document.getElementById('trial-image').alt = `实验图片 ${trial.imageId}`;
+            
+            // 更新分配方案
+            document.getElementById('trial-proposal').innerHTML = 
+                `对方得到: ${trial.other}虚拟币<br>您得到: ${trial.self}虚拟币`;
+            
+            // 重置公平性评分
+            document.querySelectorAll('input[name="fairness"]').forEach(radio => {
+                radio.checked = false;
+            });
+            
+            // 显示注视点
+            document.getElementById('fixation').style.display = 'block';
+            document.getElementById('proposal').style.display = 'none';
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('fairness-rating').style.display = 'none';
+            
+            // 注视点显示500ms
+            setTimeout(() => {
+                document.getElementById('fixation').style.display = 'none';
+                
+                // 显示全屏图片
+                document.getElementById('image-presentation').style.display = 'flex';
+                
+                // 图片显示2000ms
+                setTimeout(() => {
+                    // 隐藏图片
+                    document.getElementById('image-presentation').style.display = 'none';
+                    
+                    // 白屏500ms
+                    setTimeout(() => {
+                        document.getElementById('proposal').style.display = 'block';
+                    }, 500);
+                }, 2000);
+            }, 500);
+            
+            // 存储试次开始时间
+            experimentData.currentTrialStart = new Date();
+        }
+        
+        function makeDecision(decision) {
+            const trialIndex = experimentData.currentTrial;
+            const trial = trialSequence[trialIndex];
+            
+            let feedbackText = '';
+            if (decision === 'accept') {
+                feedbackText = `您接受该提议，对方得到${trial.other}虚拟币，您得到${trial.self}虚拟币`;
+            } else {
+                feedbackText = `您拒绝该提议，双方都得到0虚拟币`;
+            }
+            
+            document.getElementById('trial-feedback').textContent = feedbackText;
+            document.getElementById('proposal').style.display = 'none';
+            document.getElementById('feedback').style.display = 'block';
+            
+            // 记录决策和反应时间
+            const reactionTime = new Date() - experimentData.currentTrialStart;
+            
+            // 存储试次数据
+            experimentData.trials.push({
+                trialIndex: trialIndex,
+                proposal: trial,
+                decision: decision,
+                reactionTime: reactionTime,
+                timestamp: new Date()
+            });
+            
+            // 反馈显示1000ms后显示公平性评分
+            setTimeout(() => {
+                document.getElementById('feedback').style.display = 'none';
+                document.getElementById('fairness-rating').style.display = 'block';
+            }, 1000);
+        }
+        
+        function nextTrial() {
+            // 获取公平性评分
+            const selectedFairness = document.querySelector('input[name="fairness"]:checked');
+            if (!selectedFairness) {
+                alert('请选择公平性评分');
+                return;
+            }
+            
+            // 记录公平性评分
+            experimentData.trials[experimentData.currentTrial].fairness = parseInt(selectedFairness.value);
+            
+            // 检查是否所有试次都已完成
+            if (experimentData.currentTrial < trialSequence.length - 1) {
+                runTrial(experimentData.currentTrial + 1);
+            } else {
+                endExperiment();
+            }
+        }
+        
+        // 生成CSV数据
+        function generateCSV() {
+            let csvContent = "参与者编号,匹配参与者,分组,试次,分配方案(对方),分配方案(自己),决策,反应时间(ms),公平性评分,时间戳,图片文件名\n";
+            
+            experimentData.trials.forEach(trial => {
+                csvContent += `"${experimentData.participantId}","${experimentData.matchedParticipant}","${experimentData.group.name}","${trial.trialIndex + 1}","${trial.proposal.other}","${trial.proposal.self}","${trial.decision}","${trial.reactionTime}","${trial.fairness}","${trial.timestamp}","${trial.proposal.imagePath}"\n`;
+            });
+            
+            return csvContent;
+        }
+        
+        // 下载CSV文件
+        function downloadCSV() {
+            const csvContent = generateCSV();
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", `最后通牒实验_${experimentData.participantId}_${experimentData.group.name}组_${timestamp}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // 模拟数据上传到服务器
+        function uploadDataToServer() {
+            // 在实际应用中，这里应该是一个真实的API端点
+            // 例如：fetch('https://your-api.com/upload-data', { method: 'POST', body: generateCSV() })
+            
+            // 这里我们只是模拟上传过程
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    // 在实际应用中，这里应该检查响应状态
+                    resolve(true);
+                }, 1500);
+            });
+        }
+        
+        async function endExperiment() {
+            showScreen('screen8');
+            
+            // 显示被试被分配到的组别
+            document.getElementById('group-assignment').textContent = experimentData.group.name;
+            
+            // 模拟数据上传
+            try {
+                await uploadDataToServer();
+                document.getElementById('upload-status').style.display = 'block';
+                
+                // 在实际应用中，你可能想要将数据发送到服务器
+                // 这里我们只是下载CSV文件作为备份
+                downloadCSV();
+            } catch (error) {
+                console.error('数据上传失败:', error);
+                // 即使上传失败，也下载CSV文件作为备份
+                downloadCSV();
+            }
+        }
+        
+        function restartExperiment() {
+            // 重置实验数据
+            experimentData.participantId = '';
+            experimentData.matchedParticipant = 0;
+            experimentData.practiceTrials = [];
+            experimentData.trials = [];
+            experimentData.currentTrial = 0;
+            experimentData.startTime = null;
+            experimentData.group = '';
+            
+            // 回到第一个屏幕
+            showScreen('screen1');
+            document.getElementById('participant-id').value = '';
+            document.getElementById('upload-status').style.display = 'none';
+        }
+        
+        // 键盘事件监听
+        document.addEventListener('keydown', function(event) {
+            // 屏幕1：按空格键开始实验说明
+            if (document.getElementById('screen1').classList.contains('active') && event.key === ' ') {
+                startInstructions();
+            }
+            
+            // 屏幕2：按空格键开始网络连接
+            if (document.getElementById('screen2').classList.contains('active') && event.key === ' ') {
+                startNetwork();
+            }
+            
+            // 屏幕4：按空格键开始练习
+            if (document.getElementById('screen4').classList.contains('active') && event.key === ' ') {
+                startPractice();
+            }
+            
+            // 练习阶段的按键
+            if (document.getElementById('screen5').classList.contains('active')) {
+                if (event.key === 'f' || event.key === 'F') {
+                    practiceDecision('accept');
+                } else if (event.key === 'j' || event.key === 'J') {
+                    practiceDecision('reject');
+                }
+            }
+            
+            // 练习反馈阶段的按键
+            if (document.getElementById('screen6').classList.contains('active')) {
+                if (event.key === ' ') {
+                    startExperiment();
+                } else if (event.key === 'q' || event.key === 'Q') {
+                    continuePractice();
+                }
+            }
+            
+            // 正式实验决策阶段的按键
+            if (document.getElementById('proposal').style.display === 'block') {
+                if (event.key === 'f' || event.key === 'F') {
+                    makeDecision('accept');
+                } else if (event.key === 'j' || event.key === 'J') {
+                    makeDecision('reject');
+                }
+            }
+            
+            // 公平性评分阶段按空格键继续
+            if (document.getElementById('fairness-rating').style.display === 'block' && event.key === ' ') {
+                nextTrial();
+            }
+        });
+    </script>
+</body>
+</html>
