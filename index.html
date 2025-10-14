@@ -93,6 +93,12 @@
             font-size: 2.5rem;
         }
         
+        h3 {
+            color: var(--secondary);
+            margin: 20px 0 15px;
+            font-size: 1.6rem;
+        }
+        
         .instructions {
             background: var(--light);
             padding: 35px;
@@ -105,6 +111,19 @@
             max-width: 900px;
             margin-left: auto;
             margin-right: auto;
+        }
+        
+        .instructions p {
+            margin-bottom: 20px;
+        }
+        
+        .instructions ul {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
         }
         
         .input-group {
@@ -334,6 +353,155 @@
             font-size: 1.2rem;
         }
         
+        /* 新增样式 */
+        .demographics-form {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: left;
+        }
+        
+        .form-group {
+            margin-bottom: 30px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.3rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .gender-options {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        
+        .gender-option {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .gender-option input {
+            display: none;
+        }
+        
+        .gender-option label {
+            display: block;
+            padding: 20px;
+            background: var(--light);
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.3rem;
+            font-weight: normal;
+        }
+        
+        .gender-option input:checked + label {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .comprehension-question {
+            background: var(--light);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 25px 0;
+            text-align: left;
+        }
+        
+        .comprehension-question h3 {
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+        
+        .comprehension-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .comprehension-option {
+            display: flex;
+            align-items: center;
+        }
+        
+        .comprehension-option input {
+            margin-right: 15px;
+            transform: scale(1.5);
+        }
+        
+        .comprehension-option label {
+            font-size: 1.3rem;
+        }
+        
+        .questionnaire-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+        
+        .questionnaire-table th, .questionnaire-table td {
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .questionnaire-table th {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .questionnaire-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .questionnaire-table input[type="radio"] {
+            transform: scale(1.5);
+        }
+        
+        .copy-email {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            margin: 15px 0;
+        }
+        
+        .copy-email:hover {
+            background: var(--secondary);
+        }
+        
+        .email-instructions {
+            background: var(--light);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            text-align: left;
+        }
+        
         @media (max-width: 1200px) {
             h1 {
                 font-size: 2.5rem;
@@ -397,6 +565,10 @@
                 padding: 15px 30px;
                 font-size: 1.2rem;
             }
+            
+            .gender-options {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -413,34 +585,117 @@
                     <p>请输入您的实验编号：</p>
                     <input type="text" id="participant-id" placeholder="例如: P001">
                 </div>
-                <button class="btn" onclick="startInstructions()">开始实验</button>
+                <button class="btn" onclick="showDemographics()">开始实验</button>
                 <p class="space-hint">提示：在实验过程中，您可以使用空格键继续</p>
             </div>
         </div>
         
-        <!-- 屏幕2: 实验说明 -->
+        <!-- 屏幕2: 人口学信息 -->
         <div id="screen2" class="screen">
+            <div class="center-content">
+                <h1>基本信息填写</h1>
+                <div class="demographics-form">
+                    <div class="form-group">
+                        <label for="age">年龄：</label>
+                        <input type="text" id="age" placeholder="请输入您的年龄（整数）" oninput="validateAge(this)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>性别：</label>
+                        <div class="gender-options">
+                            <div class="gender-option">
+                                <input type="radio" id="male" name="gender" value="男">
+                                <label for="male">男</label>
+                            </div>
+                            <div class="gender-option">
+                                <input type="radio" id="female" name="gender" value="女">
+                                <label for="female">女</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="major">专业：</label>
+                        <select id="major">
+                            <option value="">请选择您的专业</option>
+                            <option value="01哲学">01哲学</option>
+                            <option value="02经济学">02经济学</option>
+                            <option value="03法学">03法学</option>
+                            <option value="04教育学">04教育学</option>
+                            <option value="05文学">05文学</option>
+                            <option value="06历史学">06历史学</option>
+                            <option value="07理学">07理学</option>
+                            <option value="08工学">08工学</option>
+                            <option value="09农学">09农学</option>
+                            <option value="10医学">10医学</option>
+                            <option value="11军事">11军事</option>
+                            <option value="12管理学">12管理学</option>
+                            <option value="13艺术学">13艺术学</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="education">学历：</label>
+                        <select id="education">
+                            <option value="">请选择您的学历</option>
+                            <option value="高中及以下">高中及以下</option>
+                            <option value="大学专科">大学专科</option>
+                            <option value="大学本科">大学本科</option>
+                            <option value="硕士研究生以上">硕士研究生以上</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="health">健康状态：</label>
+                        <select id="health">
+                            <option value="良好" selected>良好</option>
+                            <option value="一般">一般</option>
+                            <option value="较差">较差</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn" onclick="saveDemographics()">确认并继续</button>
+            </div>
+        </div>
+        
+        <!-- 屏幕3: 实验说明 -->
+        <div id="screen3" class="screen">
             <div class="center-content">
                 <h1>实验说明</h1>
                 <div class="instructions">
-                    <p>在本实验中，您将与另一位参与者配对进行一项资源分配任务。</p>
-                    <p>对方将获得10个虚拟币，并决定如何分配这些虚拟币。</p>
-                    <p>对方会提出一个分配方案（例如：对方得到5虚拟币，您得到5虚拟币）。</p>
-                    <p>您的任务是决定是否接受这个分配方案：</p>
-                    <div class="response-keys">
-                        <div class="key">按 <strong>F</strong> 键接受提议</div>
-                        <div class="key">按 <strong>J</strong> 键拒绝提议</div>
-                    </div>
-                    <p>如果您接受提议，双方将按照提议获得虚拟币。</p>
-                    <p>如果您拒绝提议，双方都将得到0虚拟币。</p>
+                    <p><strong>同学，您好！</strong></p>
+                    <p>欢迎参与本次心理学行为实验。在本实验中，您将有机会通过完成决策任务获得一笔额外的现金报酬。您的所有决策都将被严格保密，仅用于学术研究。</p>
+                    
+                    <h3>任务说明：</h3>
+                    <p><strong>任务角色：</strong>在接下来的任务中，您将扮演"回应者"的角色。系统会随机将您与另一位匿名的"提议者"配对。</p>
+                    <p><strong>分配方案：</strong>在每一轮任务中，您和提议者将共同分配一笔<strong>【10元钱】</strong>。提议者会提出一个分配方案，例如："他得8元，您得2元"。</p>
+                    
+                    <h3>您的权力与决策：</h3>
+                    <p>看到方案后，您需要决定：</p>
+                    <ul>
+                        <li><strong>"接受"</strong>：如果您接受该方案，则双方按照该方案获得相应的金额。</li>
+                        <li><strong>"拒绝"</strong>：如果您拒绝该方案，则本轮您和提议者都得不到任何钱，收益为0。</li>
+                    </ul>
+                    <p>您将完成若干轮类似的决策。</p>
+                    
+                    <h3>报酬说明：</h3>
+                    <p>实验结束后，系统将从您完成的所有轮次中随机抽取一轮，并按照您在该轮次的实际收益作为您的额外报酬。因此，请认真对待您的每一个决策，因为它将直接关系到您最终能获得的报酬。</p>
+                    
+                    <h3>关键提醒：</h3>
+                    <ul>
+                        <li>您的配对对象是真实存在的其他参与者。</li>
+                        <li>请根据您自身的真实想法进行选择，答案没有对错之分。</li>
+                        <li>在任务过程中，我们还会请您对分配方案的公平性进行评价。</li>
+                    </ul>
+                    <p>如果您已完全理解上述规则，请点击下方按钮开始练习环节，以熟悉操作流程。</p>
                 </div>
                 <button class="btn" onclick="startNetwork()">理解，继续</button>
                 <p class="space-hint">按空格键继续</p>
             </div>
         </div>
         
-        <!-- 屏幕3: 网络连接 -->
-        <div id="screen3" class="screen">
+        <!-- 屏幕4: 网络连接 -->
+        <div id="screen4" class="screen">
             <div class="center-content">
                 <h1>正在连接服务器...</h1>
                 <div class="network-connecting">● ● ●</div>
@@ -448,8 +703,8 @@
             </div>
         </div>
         
-        <!-- 屏幕4: 匹配成功 -->
-        <div id="screen4" class="screen">
+        <!-- 屏幕5: 匹配成功 -->
+        <div id="screen5" class="screen">
             <div class="center-content">
                 <h1>匹配成功！</h1>
                 <div class="instructions">
@@ -460,8 +715,8 @@
             </div>
         </div>
         
-        <!-- 屏幕5: 练习阶段 -->
-        <div id="screen5" class="screen">
+        <!-- 屏幕6: 练习阶段 -->
+        <div id="screen6" class="screen">
             <div class="center-content">
                 <h2>练习阶段</h2>
                 <div class="trial-counter">练习试次</div>
@@ -477,8 +732,8 @@
             </div>
         </div>
         
-        <!-- 屏幕6: 练习反馈 -->
-        <div id="screen6" class="screen">
+        <!-- 屏幕7: 练习反馈 -->
+        <div id="screen7" class="screen">
             <div class="center-content">
                 <h2>练习反馈</h2>
                 <div class="feedback" id="practice-feedback">
@@ -493,8 +748,8 @@
             </div>
         </div>
         
-        <!-- 屏幕7: 正式实验 -->
-        <div id="screen7" class="screen">
+        <!-- 屏幕8: 正式实验 -->
+        <div id="screen8" class="screen">
             <div class="center-content">
                 <div class="progress-container">
                     <div class="progress-bar" id="progress-bar"></div>
@@ -568,18 +823,205 @@
             </div>
         </div>
         
-        <!-- 屏幕8: 实验结束 -->
-        <div id="screen8" class="screen">
+        <!-- 屏幕9: 理解测试 -->
+        <div id="screen9" class="screen">
             <div class="center-content">
-                <h1>实验结束</h1>
-                <div class="instructions">
-                    <p>感谢您参与本次最后通牒者实验！</p>
-                    <p>您的数据已记录，实验虚拟币将根据您的表现进行计算。</p>
-                    <p>数据已保存，实验结束。</p>
-                    <p>您被分配到：<span id="group-assignment" style="color: var(--primary); font-weight: bold;"></span>组</p>
+                <h1>理解测试</h1>
+                <p>请回答以下问题，以确保您完全理解实验规则。</p>
+                
+                <div class="comprehension-question">
+                    <h3>第一题：在这个任务中，您扮演什么角色？</h3>
+                    <div class="comprehension-options">
+                        <div class="comprehension-option">
+                            <input type="radio" id="q1a" name="q1" value="A">
+                            <label for="q1a">A. 提议者：我决定如何分配钱。</label>
+                        </div>
+                        <div class="comprehension-option">
+                            <input type="radio" id="q1b" name="q1" value="B">
+                            <label for="q1b">B. 回应者：我可以选择接受或拒绝对方提出的分配方案。</label>
+                        </div>
+                        <div class="comprehension-option">
+                            <input type="radio" id="q1c" name="q1" value="C">
+                            <label for="q1c">C. 第三方：我观察别人的分配并决定是否惩罚。</label>
+                        </div>
+                    </div>
                 </div>
-                <div id="upload-status" style="margin: 30px 0; padding: 20px; border-radius: 15px; background-color: #e9f7ef; color: #2d5016; display: none; font-size: 1.3rem;">
-                    数据上传成功！
+                
+                <div class="comprehension-question">
+                    <h3>第二题：如果您选择拒绝一个【提议者得8元，您得2元】的方案，最终结果是什么？</h3>
+                    <div class="comprehension-options">
+                        <div class="comprehension-option">
+                            <input type="radio" id="q2a" name="q2" value="A">
+                            <label for="q2a">A. 您和提议者都得到0元。</label>
+                        </div>
+                        <div class="comprehension-option">
+                            <input type="radio" id="q2b" name="q2" value="B">
+                            <label for="q2b">B. 您得到2元，提议者得到8元。</label>
+                        </div>
+                        <div class="comprehension-option">
+                            <input type="radio" id="q2c" name="q2" value="C">
+                            <label for="q2c">C. 系统会为您分配一个更公平的新方案。</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="checkComprehension()">提交答案</button>
+            </div>
+        </div>
+        
+        <!-- 屏幕10: 不确定性容忍度量表 -->
+        <div id="screen10" class="screen">
+            <div class="center-content">
+                <h1>不确定性容忍度量表</h1>
+                <p>请仔细阅读下面的句子，选择在最符合您情况的选项上打"√"。其中1表示"完全不符合",2表示"比较不符合",3表示"有点符合",4表示"比较符合",5表示"完全符合"。(请不要多选或漏选)</p>
+                
+                <table class="questionnaire-table">
+                    <thead>
+                        <tr>
+                            <th width="60%">题目</th>
+                            <th>1<br>完全不符合</th>
+                            <th>2<br>比较不符合</th>
+                            <th>3<br>有点符合</th>
+                            <th>4<br>比较符合</th>
+                            <th>5<br>完全符合</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="text-align: left;">1. 无法预料的事情会让我心烦意乱。</td>
+                            <td><input type="radio" name="q1" value="1"></td>
+                            <td><input type="radio" name="q1" value="2"></td>
+                            <td><input type="radio" name="q1" value="3"></td>
+                            <td><input type="radio" name="q1" value="4"></td>
+                            <td><input type="radio" name="q1" value="5"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">2. 如果不能拥有我所需要的全部信息，我会很沮丧。</td>
+                            <td><input type="radio" name="q2" value="1"></td>
+                            <td><input type="radio" name="q2" value="2"></td>
+                            <td><input type="radio" name="q2" value="3"></td>
+                            <td><input type="radio" name="q2" value="4"></td>
+                            <td><input type="radio" name="q2" value="5"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">3. 不确定性让我过得不好。</td>
+                            <td><input type="radio" name="q3" value="1"></td>
+                            <td><input type="radio" name="q3" value="2"></td>
+                            <td><input type="radio" name="q3" value="3"></td>
+                            <td><input type="radio" name="q3" value="4"></td>
+                            <td><input type="radio" name="q3" value="5"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">4. 我做事总会未雨绸缪，以避免措手不及。</td>
+                            <td><input type="radio" name="q4" value="1"></td>
+                            <td><input type="radio" name="q4" value="2"></td>
+                            <td><input type="radio" name="q4" value="3"></td>
+                            <td><input type="radio" name="q4" value="4"></td>
+                            <td><input type="radio" name="q4" value="5"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">5. 即使有最好的计划，一个小意外也能搞砸我的全盘计划。</td>
+                            <td><input type="radio" name="q5" value="1"></td>
+                            <td><input type="radio" name="q5" value="2"></td>
+                            <td><input type="radio" name="q5" value="3"></td>
+                            <td><input type="radio" name="q5" value="4"></td>
+                            <td><input type="radio" name="q5" value="5"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">6. 当到了采取行动的时候，不确定性会让我停滞不前。</td>
+                            <td><input type="radio" name="q6" value="1"></td>
+                            <td><input type="radio" name="q6" value="2"></td>
+                            <td><input type="radio" name="q6" value="3"></td>
+                            <td><input type="radio" name="q6" value="4"></td>
+                            <td><input type="radio" name="q6" value="5"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">7. 当我感到不确定时，我就不能很好地表现自己。</td>
+                            <td><input type="radio" name="q7" value="1"></td>
+                            <td><input type="radio" name="q7" value="2"></td>
+                            <td><input type="radio" name="q7" value="3"></td>
+                            <td><input type="radio" name="q7" value="4"></td>
+                            <td><input type="radio" name="q7" value="5"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">8. 我总是想知道我的未来是什么样子的。</td>
+                            <td><input type="radio" name="q8" value="1"></td>
+                            <td><input type="radio" name="q8" value="2"></td>
+                            <td><input type="radio" name="q8" value="3"></td>
+                            <td><input type="radio" name="q8" value="4"></td>
+                            <td><input type="radio" name="q8" value="5"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">9. 我无法忍受突发状况。</td>
+                            <td><input type="radio" name="q9" value="1"></td>
+                            <td><input type="radio" name="q9" value="2"></td>
+                            <td><input type="radio" name="q9" value="3"></td>
+                            <td><input type="radio" name="q9" value="4"></td>
+                            <td><input type="radio" name="q9" value="5"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">10. 一点点的疑惑都会阻止我行动。</td>
+                            <td><input type="radio" name="q10" value="1"></td>
+                            <td><input type="radio" name="q10" value="2"></td>
+                            <td><input type="radio" name="q10" value="3"></td>
+                            <td><input type="radio" name="q10" value="4"></td>
+                            <td><input type="radio" name="q10" value="5"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">11. 在做事之前，我应该能够规划好一切。</td>
+                            <td><input type="radio" name="q11" value="1"></td>
+                            <td><input type="radio" name="q11" value="2"></td>
+                            <td><input type="radio" name="q11" value="3"></td>
+                            <td><input type="radio" name="q11" value="4"></td>
+                            <td><input type="radio" name="q11" value="5"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">12. 我必须摆脱所有不确定的情形。</td>
+                            <td><input type="radio" name="q12" value="1"></td>
+                            <td><input type="radio" name="q12" value="2"></td>
+                            <td><input type="radio" name="q12" value="3"></td>
+                            <td><input type="radio" name="q12" value="4"></td>
+                            <td><input type="radio" name="q12" value="5"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <button class="btn" onclick="saveQuestionnaire()">提交问卷</button>
+            </div>
+        </div>
+        
+        <!-- 屏幕11: 邮箱和手机号提示页面 -->
+        <div id="screen11" class="screen">
+            <div class="center-content">
+                <h1>实验完成，感谢您的参与！</h1>
+                <div class="instructions">
+                    <p>请将实验数据文件和您的手机号发送到主试邮箱：</p>
+                    <button class="copy-email" onclick="copyEmail()">17302724184@163.com（点击复制）</button>
+                    
+                    <div class="email-instructions">
+                        <h3>发送邮件说明：</h3>
+                        <ul>
+                            <li>请将下载的实验数据文件作为附件</li>
+                            <li>在邮件<strong>主题或内容</strong>中注明您的<strong>手机号</strong></li>
+                            <li>手机号将用于后续支付被试费</li>
+                        </ul>
+                    </div>
+                    
+                    <p>点击下方按钮下载您的实验数据文件：</p>
+                    <button class="btn" onclick="downloadData()">下载实验数据</button>
+                </div>
+                <div id="download-status" style="margin: 30px 0; padding: 20px; border-radius: 15px; background-color: #e9f7ef; color: #2d5016; display: none; font-size: 1.3rem;">
+                    数据下载成功！
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕12: 最终完成页面 -->
+        <div id="screen12" class="screen">
+            <div class="center-content">
+                <h1>实验已完成</h1>
+                <div class="instructions">
+                    <p>感谢您的参与！祝您生活愉快！</p>
                 </div>
             </div>
         </div>
@@ -594,6 +1036,20 @@
         // 实验数据存储
         const experimentData = {
             participantId: '',
+            demographics: {
+                age: '',
+                gender: '',
+                major: '',
+                education: '',
+                health: ''
+            },
+            comprehension: {
+                q1: '',
+                q2: '',
+                q1Correct: false,
+                q2Correct: false
+            },
+            uncertaintyTolerance: {},
             matchedParticipant: 0,
             practiceTrials: [],
             trials: [],
@@ -667,8 +1123,20 @@
             document.getElementById(screenId).classList.add('active');
         }
         
-        // 开始实验流程
-        function startInstructions() {
+        // 年龄验证函数
+        function validateAge(input) {
+            // 只允许输入数字
+            input.value = input.value.replace(/[^0-9]/g, '');
+            
+            // 限制年龄范围（1-120）
+            const age = parseInt(input.value);
+            if (age > 120) {
+                input.value = '120';
+            }
+        }
+        
+        // 显示人口学信息页面
+        function showDemographics() {
             const participantId = document.getElementById('participant-id').value;
             if (!participantId) {
                 alert('请输入您的实验编号');
@@ -676,6 +1144,46 @@
             }
             
             experimentData.participantId = participantId;
+            showScreen('screen2');
+        }
+        
+        // 保存人口学信息
+        function saveDemographics() {
+            const age = document.getElementById('age').value;
+            const gender = document.querySelector('input[name="gender"]:checked');
+            const major = document.getElementById('major').value;
+            const education = document.getElementById('education').value;
+            const health = document.getElementById('health').value;
+            
+            if (!age) {
+                alert('请输入您的年龄');
+                return;
+            }
+            
+            if (!gender) {
+                alert('请选择您的性别');
+                return;
+            }
+            
+            if (!major) {
+                alert('请选择您的专业');
+                return;
+            }
+            
+            if (!education) {
+                alert('请选择您的学历');
+                return;
+            }
+            
+            // 保存人口学信息
+            experimentData.demographics = {
+                age: age,
+                gender: gender.value,
+                major: major,
+                education: education,
+                health: health
+            };
+            
             experimentData.startTime = new Date();
             
             // 随机分配被试到图片组
@@ -707,23 +1215,23 @@
             // 随机化试次顺序
             trialSequence = shuffleArray(trialSequence);
             
-            showScreen('screen2');
+            showScreen('screen3');
         }
         
         function startNetwork() {
-            showScreen('screen3');
+            showScreen('screen4');
             
             // 模拟网络连接延迟
             setTimeout(() => {
                 // 随机生成匹配的参与者编号
                 experimentData.matchedParticipant = Math.floor(Math.random() * 36) + 1;
                 document.getElementById('matched-participant').textContent = experimentData.matchedParticipant;
-                showScreen('screen4');
+                showScreen('screen5');
             }, 2000);
         }
         
         function startPractice() {
-            showScreen('screen5');
+            showScreen('screen6');
             // 随机选择一个分配方案用于练习
             const practiceProposal = proposals[Math.floor(Math.random() * proposals.length)];
             document.getElementById('practice-proposal').innerHTML = 
@@ -752,7 +1260,7 @@
                 timestamp: new Date()
             });
             
-            showScreen('screen6');
+            showScreen('screen7');
         }
         
         function continuePractice() {
@@ -760,7 +1268,7 @@
         }
         
         function startExperiment() {
-            showScreen('screen7');
+            showScreen('screen8');
             runTrial(0);
         }
         
@@ -863,23 +1371,98 @@
             if (experimentData.currentTrial < trialSequence.length - 1) {
                 runTrial(experimentData.currentTrial + 1);
             } else {
-                endExperiment();
+                showComprehensionTest();
             }
+        }
+        
+        function showComprehensionTest() {
+            showScreen('screen9');
+        }
+        
+        function checkComprehension() {
+            const q1Answer = document.querySelector('input[name="q1"]:checked');
+            const q2Answer = document.querySelector('input[name="q2"]:checked');
+            
+            if (!q1Answer || !q2Answer) {
+                alert('请回答所有问题');
+                return;
+            }
+            
+            // 记录答案并检查正确性
+            experimentData.comprehension.q1 = q1Answer.value;
+            experimentData.comprehension.q2 = q2Answer.value;
+            experimentData.comprehension.q1Correct = (q1Answer.value === 'B');
+            experimentData.comprehension.q2Correct = (q2Answer.value === 'A');
+            
+            // 无论答案是否正确，都继续实验
+            showUncertaintyToleranceQuestionnaire();
+        }
+        
+        function showUncertaintyToleranceQuestionnaire() {
+            showScreen('screen10');
+        }
+        
+        function saveQuestionnaire() {
+            // 收集不确定性容忍度量表数据
+            for (let i = 1; i <= 12; i++) {
+                const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
+                if (!selectedOption) {
+                    alert(`请回答第${i}题`);
+                    return;
+                }
+                experimentData.uncertaintyTolerance[`q${i}`] = parseInt(selectedOption.value);
+            }
+            
+            showScreen('screen11');
+        }
+        
+        // 复制邮箱到剪贴板
+        function copyEmail() {
+            const email = '17302724184@163.com';
+            navigator.clipboard.writeText(email).then(() => {
+                alert('邮箱地址已复制到剪贴板');
+            }).catch(err => {
+                console.error('复制失败:', err);
+                // 备用方法
+                const textArea = document.createElement('textarea');
+                textArea.value = email;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('邮箱地址已复制到剪贴板');
+            });
         }
         
         // 生成CSV数据
         function generateCSV() {
-            let csvContent = "参与者编号,匹配参与者,分组,试次,分配方案(对方),分配方案(自己),决策,反应时间(ms),公平性评分,时间戳,图片文件名\n";
+            let csvContent = "参与者编号,年龄,性别,专业,学历,健康状态,匹配参与者,分组,理解测试1答案,理解测试1正确,理解测试2答案,理解测试2正确,试次,分配方案(对方),分配方案(自己),决策,反应时间(ms),公平性评分,时间戳,图片文件名";
             
+            // 添加不确定性容忍度量表标题
+            for (let i = 1; i <= 12; i++) {
+                csvContent += `,不确定性容忍度${i}`;
+            }
+            
+            csvContent += "\n";
+            
+            // 添加实验数据
             experimentData.trials.forEach(trial => {
-                csvContent += `"${experimentData.participantId}","${experimentData.matchedParticipant}","${experimentData.group.name}","${trial.trialIndex + 1}","${trial.proposal.other}","${trial.proposal.self}","${trial.decision}","${trial.reactionTime}","${trial.fairness}","${trial.timestamp}","${trial.proposal.imagePath}"\n`;
+                let row = `"${experimentData.participantId}","${experimentData.demographics.age}","${experimentData.demographics.gender}","${experimentData.demographics.major}","${experimentData.demographics.education}","${experimentData.demographics.health}","${experimentData.matchedParticipant}","${experimentData.group.name}","${experimentData.comprehension.q1}","${experimentData.comprehension.q1Correct}","${experimentData.comprehension.q2}","${experimentData.comprehension.q2Correct}","${trial.trialIndex + 1}","${trial.proposal.other}","${trial.proposal.self}","${trial.decision}","${trial.reactionTime}","${trial.fairness}","${trial.timestamp}","${trial.proposal.imagePath}"`;
+                
+                // 添加不确定性容忍度量表数据
+                for (let i = 1; i <= 12; i++) {
+                    row += `,"${experimentData.uncertaintyTolerance[`q${i}`] || ''}"`;
+                }
+                
+                row += "\n";
+                csvContent += row;
             });
             
             return csvContent;
         }
         
         // 下载CSV文件
-        function downloadCSV() {
+        function downloadData() {
             const csvContent = generateCSV();
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
@@ -892,6 +1475,14 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            
+            // 显示下载成功状态
+            document.getElementById('download-status').style.display = 'block';
+            
+            // 延迟后自动跳转到最终完成页面
+            setTimeout(() => {
+                showScreen('screen12');
+            }, 2000);
         }
         
         // 模拟数据上传到服务器
@@ -908,30 +1499,23 @@
             });
         }
         
-        async function endExperiment() {
-            showScreen('screen8');
-            
-            // 显示被试被分配到的组别
-            document.getElementById('group-assignment').textContent = experimentData.group.name;
-            
-            // 模拟数据上传
-            try {
-                await uploadDataToServer();
-                document.getElementById('upload-status').style.display = 'block';
-                
-                // 在实际应用中，你可能想要将数据发送到服务器
-                // 这里我们只是下载CSV文件作为备份
-                downloadCSV();
-            } catch (error) {
-                console.error('数据上传失败:', error);
-                // 即使上传失败，也下载CSV文件作为备份
-                downloadCSV();
-            }
-        }
-        
         function restartExperiment() {
             // 重置实验数据
             experimentData.participantId = '';
+            experimentData.demographics = {
+                age: '',
+                gender: '',
+                major: '',
+                education: '',
+                health: ''
+            };
+            experimentData.comprehension = {
+                q1: '',
+                q2: '',
+                q1Correct: false,
+                q2Correct: false
+            };
+            experimentData.uncertaintyTolerance = {};
             experimentData.matchedParticipant = 0;
             experimentData.practiceTrials = [];
             experimentData.trials = [];
@@ -942,28 +1526,28 @@
             // 回到第一个屏幕
             showScreen('screen1');
             document.getElementById('participant-id').value = '';
-            document.getElementById('upload-status').style.display = 'none';
+            document.getElementById('download-status').style.display = 'none';
         }
         
         // 键盘事件监听
         document.addEventListener('keydown', function(event) {
             // 屏幕1：按空格键开始实验说明
             if (document.getElementById('screen1').classList.contains('active') && event.key === ' ') {
-                startInstructions();
+                showDemographics();
             }
             
-            // 屏幕2：按空格键开始网络连接
-            if (document.getElementById('screen2').classList.contains('active') && event.key === ' ') {
+            // 屏幕3：按空格键开始网络连接
+            if (document.getElementById('screen3').classList.contains('active') && event.key === ' ') {
                 startNetwork();
             }
             
-            // 屏幕4：按空格键开始练习
-            if (document.getElementById('screen4').classList.contains('active') && event.key === ' ') {
+            // 屏幕5：按空格键开始练习
+            if (document.getElementById('screen5').classList.contains('active') && event.key === ' ') {
                 startPractice();
             }
             
             // 练习阶段的按键
-            if (document.getElementById('screen5').classList.contains('active')) {
+            if (document.getElementById('screen6').classList.contains('active')) {
                 if (event.key === 'f' || event.key === 'F') {
                     practiceDecision('accept');
                 } else if (event.key === 'j' || event.key === 'J') {
@@ -972,12 +1556,17 @@
             }
             
             // 练习反馈阶段的按键
-            if (document.getElementById('screen6').classList.contains('active')) {
+            if (document.getElementById('screen7').classList.contains('active')) {
                 if (event.key === ' ') {
                     startExperiment();
                 } else if (event.key === 'q' || event.key === 'Q') {
                     continuePractice();
                 }
+            }
+            
+            // 理解测试阶段按空格键提交
+            if (document.getElementById('screen9').classList.contains('active') && event.key === ' ') {
+                checkComprehension();
             }
             
             // 正式实验决策阶段的按键
@@ -992,6 +1581,16 @@
             // 公平性评分阶段按空格键继续
             if (document.getElementById('fairness-rating').style.display === 'block' && event.key === ' ') {
                 nextTrial();
+            }
+            
+            // 不确定性容忍度量表按空格键提交
+            if (document.getElementById('screen10').classList.contains('active') && event.key === ' ') {
+                saveQuestionnaire();
+            }
+            
+            // 屏幕11按空格键下载数据
+            if (document.getElementById('screen11').classList.contains('active') && event.key === ' ') {
+                downloadData();
             }
         });
     </script>
