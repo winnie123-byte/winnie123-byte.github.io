@@ -1,0 +1,3271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实验二</title>
+    <!-- 添加 seedrandom 库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
+    <style>
+        /* 样式保持不变，与之前相同 */
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #e63946;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 0;
+            box-shadow: none;
+            width: 100%;
+            height: 100vh;
+            max-width: none;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .screen {
+            padding: 20px;
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .active {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        
+        .center-content {
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            width: 100%;
+            max-width: 100%;
+            padding: 0 15px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        
+        .screen-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 15px 0;
+            z-index: 10;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 2.2rem;
+            position: relative;
+            padding-bottom: 12px;
+        }
+        
+        h1:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        h2 {
+            color: var(--secondary);
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        
+        h3 {
+            color: var(--secondary);
+            margin: 12px 0 10px;
+            font-size: 1.3rem;
+        }
+        
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0 20px;
+            width: 100%;
+        }
+        
+        .instructions {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            text-align: left;
+            font-size: 1rem;
+            line-height: 1.4;
+            border-left: 4px solid var(--primary);
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+        
+        /* 调整指导语列表的左边距 */
+        .instructions ul {
+            margin-left: 25px; /* 增加左边距 */
+            margin-bottom: 12px;
+        }
+        
+        .instructions ol {
+            margin-left: 25px; /* 增加左边距 */
+            margin-bottom: 12px;
+        }
+        
+        .environment-alert {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 1.1rem;
+            line-height: 1.4;
+            border-left: 4px solid #ffc107;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+            color: #856404;
+            font-weight: 600;
+        }
+        
+        .instructions p {
+            margin-bottom: 10px;
+        }
+        
+        .instructions li {
+            margin-bottom: 6px;
+        }
+        
+        .input-group {
+            margin: 15px 0;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            max-width: 350px;
+            padding: 15px;
+            font-size: 1.1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            margin: 10px 0;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+        
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-accept {
+            background: var(--success);
+        }
+        
+        .btn-reject {
+            background: var(--danger);
+        }
+        
+        .btn-accept:hover {
+            background: #3aa8d5;
+        }
+        
+        .btn-reject:hover {
+            background: #c1121f;
+        }
+        
+        .response-keys {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .key {
+            padding: 15px 30px;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            font-weight: bold;
+            min-width: 160px;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .proposal-display {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 1.6rem;
+            font-weight: bold;
+            border: 3px solid var(--primary);
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+        
+        .feedback {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 1.4rem;
+            font-weight: bold;
+            border-left: 4px solid var(--primary);
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+        
+        .network-connecting {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 20px 0;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        .progress-container {
+            width: 100%;
+            max-width: 100%;
+            background: #e9ecef;
+            border-radius: 10px;
+            margin: 15px auto;
+            height: 15px;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .trial-counter {
+            background: var(--light);
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 12px 0;
+            font-weight: bold;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+        
+        /* 修改十字注视点样式，确保在屏幕正中间 */
+        .fixation-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 60vh; /* 使用视口高度的一部分确保居中 */
+            width: 100%;
+        }
+        
+        .cross {
+            font-size: 4rem;
+            color: var(--dark);
+            text-align: center;
+            margin: 0 auto;
+        }
+        
+        .image-container {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: #000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .trial-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .fairness-scale {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 15px;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+        
+        .scale-options {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        
+        .scale-option {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .scale-option input {
+            margin: 8px 0;
+            transform: scale(1.5);
+        }
+        
+        .scale-option label {
+            font-size: 0.85rem;
+        }
+        
+        .data-display {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+        
+        .space-hint {
+            margin-top: 15px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* 优化继续提示样式 */
+        .continue-prompt {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .space-hint-small {
+            margin-top: 5px;
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+        
+        /* 键盘提示样式 */
+        .keyboard-hint {
+            margin-top: 15px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* 人口信息页面 - 左右两列布局 */
+        .demographics-form {
+            max-width: 100%;
+            margin: 0 auto;
+            text-align: left;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            box-sizing: border-box;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            font-size: 0.95rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .gender-options {
+            display: flex;
+            gap: 12px;
+            margin-top: 6px;
+        }
+        
+        .gender-option {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .gender-option input {
+            display: none;
+        }
+        
+        .gender-option label {
+            display: block;
+            padding: 12px;
+            background: var(--light);
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+            font-weight: normal;
+        }
+        
+        .gender-option input:checked + label {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        /* 实验说明页面 - 三列布局 */
+        .three-column-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            max-width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+        
+        .column {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .comprehension-question {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            text-align: left;
+            box-sizing: border-box;
+        }
+        
+        .comprehension-question h3 {
+            margin-bottom: 12px;
+            color: var(--secondary);
+        }
+        
+        .comprehension-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .comprehension-option {
+            display: flex;
+            align-items: center;
+        }
+        
+        .comprehension-option input {
+            margin-right: 10px;
+            transform: scale(1.3);
+        }
+        
+        .comprehension-option label {
+            font-size: 0.95rem;
+        }
+        
+        .questionnaire-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.8rem;
+            box-sizing: border-box;
+        }
+        
+        .questionnaire-table th, .questionnaire-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        .questionnaire-table th {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .questionnaire-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .questionnaire-table input[type="radio"] {
+            transform: scale(1.2);
+        }
+        
+        .copy-email {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            margin: 10px 0;
+        }
+        
+        .copy-email:hover {
+            background: var(--secondary);
+        }
+        
+        .email-instructions {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            text-align: left;
+            box-sizing: border-box;
+        }
+        
+        /* 作答地点选择页面 */
+        .location-form {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: left;
+        }
+        
+        .other-location-input {
+            margin-top: 12px;
+            display: none;
+        }
+        
+        /* 理解测试失败提示 */
+        .comprehension-failed {
+            background: #ffe6e6;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            text-align: center;
+            border-left: 4px solid var(--danger);
+        }
+        
+        /* 全屏按钮样式 */
+        .fullscreen-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            font-size: 1.2rem;
+            color: var(--primary);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* 居中显示的短句样式 */
+        .centered-message {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 1.1rem;
+        }
+        
+        /* 倒计时样式 */
+        .countdown-timer {
+            position: fixed;
+            top: 20px;
+            right: 80px;
+            background: var(--warning);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 99;
+        }
+        
+        /* 环境评估量表样式 */
+        .environment-assessment {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 15px;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+        
+        .assessment-scale {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        
+        .assessment-option {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .assessment-option input {
+            margin: 8px 0;
+            transform: scale(1.5);
+        }
+        
+        .assessment-option label {
+            font-size: 0.85rem;
+        }
+        
+        /* 从第二个代码中添加的全屏警告样式 */
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9998;
+            display: none;
+        }
+        
+        .fullscreen-warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+        }
+        
+        .fullscreen-warning h2 {
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+        
+        /* 全屏提示样式 - 保留原有样式但隐藏 */
+        .fullscreen-alert {
+            display: none !important;
+        }
+        
+        /* 键盘操作提示 */
+        .key-instruction {
+            margin: 20px 0;
+            font-size: 1.1rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .key-instruction kbd {
+            background: var(--light);
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-family: monospace;
+            font-size: 1.2rem;
+            margin: 0 5px;
+        }
+        
+        /* 练习阶段提示 */
+        .practice-instruction {
+            margin: 20px 0;
+            padding: 15px;
+            background: #e7f4ff;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        /* 休息提示页面样式 */
+        .break-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+        
+        .break-timer {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--light);
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 5px solid var(--primary);
+        }
+        
+        .break-instructions {
+            margin: 20px 0;
+            max-width: 600px;
+        }
+        
+        /* 白色屏幕样式 */
+        .white-screen {
+            background-color: white !important;
+        }
+        
+        /* 练习阶段文字样式 */
+        .practice-text {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #333;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1001;
+        }
+        
+        /* 新增加：到陌生地方频率的样式 */
+        .frequency-question {
+            margin: 25px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .frequency-scale {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .frequency-option {
+            text-align: center;
+            flex: 1;
+            padding: 10px;
+            transition: all 0.3s;
+        }
+        
+        .frequency-option:hover {
+            background: #f0f7ff;
+            border-radius: 8px;
+        }
+        
+        .frequency-option input {
+            margin: 8px 0;
+            transform: scale(1.5);
+        }
+        
+        .frequency-option label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        /* 美化环境评估量表标题 */
+        .assessment-title {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            color: var(--secondary);
+            font-size: 1.2rem;
+        }
+        
+        /* 美化页面按钮 */
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        /* 美化输入框 */
+        .form-control {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+        }
+        
+        /* 美化卡片效果 */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            border: 1px solid #f0f0f0;
+        }
+        
+        .card-title {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        /* 新添加：完成页面提示样式 */
+        .completion-hint {
+            background: #e7f4ff;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px auto;
+            max-width: 600px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .completion-hint p {
+            margin-bottom: 10px;
+        }
+        
+        .completion-hint strong {
+            color: var(--primary);
+        }
+        
+        .keyboard-exit-hint {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 12px;
+            border-left: 4px solid #ffc107;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #856404;
+        }
+        
+        /* 新增：重要提示样式 */
+        .important-hint {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px auto;
+            max-width: 600px;
+            border-left: 4px solid var(--warning);
+            color: #856404;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .important-hint p {
+            margin-bottom: 10px;
+        }
+        
+        .important-hint strong {
+            color: var(--warning);
+        }
+        
+        /* 新增：分配方案选择样式 */
+        .proposal-options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        
+        .proposal-option {
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            max-width: 180px;
+            padding: 20px 10px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e3e8f0 100%);
+            border-radius: 15px;
+            border: 2px solid var(--primary);
+            transition: all 0.3s;
+        }
+        
+        .proposal-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #eef2f7 0%, #dbe1eb 100%);
+        }
+        
+        .proposal-key {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .proposal-details {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .proposal-self {
+            color: var(--success);
+        }
+        
+        .proposal-other {
+            color: var(--accent);
+        }
+        
+        .proposal-instruction {
+            margin: 20px 0;
+            padding: 15px;
+            background: #e7f4ff;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        /* 新增：隐藏鼠标光标的样式 - 用于练习和正式实验屏幕 */
+        .hide-cursor {
+            cursor: none !important;
+        }
+        
+        /* 修改：练习和正式实验屏幕隐藏鼠标光标 */
+        #screen6, #screen8, #image-presentation {
+            cursor: none !important;
+        }
+        
+        @media (max-width: 1200px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .instructions {
+                font-size: 0.95rem;
+                padding: 15px;
+            }
+            
+            .proposal-display {
+                font-size: 1.4rem;
+                padding: 15px;
+            }
+            
+            .key {
+                min-width: 140px;
+                font-size: 0.85rem;
+            }
+            
+            .three-column-layout {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .practice-text {
+                font-size: 3rem;
+            }
+            
+            .frequency-scale {
+                flex-wrap: wrap;
+            }
+            
+            .frequency-option {
+                flex: 0 0 33.333%;
+                margin-bottom: 10px;
+            }
+            
+            .proposal-options {
+                gap: 10px;
+            }
+            
+            .proposal-option {
+                min-width: 120px;
+                padding: 15px 8px;
+            }
+            
+            .proposal-key {
+                font-size: 2rem;
+            }
+            
+            .proposal-details {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+            }
+            
+            .screen {
+                padding: 12px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            .proposal-display {
+                font-size: 1.2rem;
+                padding: 12px;
+            }
+            
+            .response-keys {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .key {
+                width: 100%;
+                max-width: 250px;
+                font-size: 0.85rem;
+            }
+            
+            .btn {
+                padding: 12px 25px;
+                font-size: 0.95rem;
+            }
+            
+            .gender-options {
+                flex-direction: column;
+            }
+            
+            .demographics-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .fullscreen-btn {
+                top: 10px;
+                right: 10px;
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            
+            .countdown-timer {
+                top: 10px;
+                right: 60px;
+                font-size: 0.9rem;
+                padding: 6px 12px;
+            }
+            
+            .practice-text {
+                font-size: 2.5rem;
+            }
+            
+            .fixation-container {
+                height: 50vh;
+            }
+            
+            .cross {
+                font-size: 3rem;
+            }
+            
+            .frequency-scale {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px;
+            }
+            
+            .frequency-option {
+                width: 100%;
+                text-align: left;
+                display: flex;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+            
+            .frequency-option input {
+                margin-right: 10px;
+            }
+            
+            .proposal-options {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .proposal-option {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 全屏警告层 - 从第二个代码中添加 -->
+    <div class="fullscreen-overlay" id="fullscreen-overlay"></div>
+    <div class="fullscreen-warning" id="fullscreen-warning">
+        <h2>⚠️ 请保持全屏模式！</h2>
+        <p>实验需要在全屏模式下进行。</p>
+        <p>请按F11键返回全屏模式。</p>
+        <button class="btn" onclick="forceFullscreen()">返回全屏</button>
+    </div>
+    
+    <!-- 全屏按钮 -->
+    <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
+    
+    <!-- 倒计时显示 -->
+    <div id="countdown-timer" class="countdown-timer" style="display: none;"></div>
+    
+    <div class="container">
+        <!-- 屏幕1: 参与者编号输入 -->
+        <div id="screen1" class="screen active">
+            <div class="center-content">
+                <div class="screen-header">
+                    <h1>独裁者实验</h1>
+                </div>
+                <div class="content-area text-center">
+                    <!-- 添加环境提示 -->
+                    <div class="environment-alert">
+                        <p>请您在安静且能不被打扰的环境下不间断地进行实验，谢谢配合！</p>
+                    </div>
+                    
+                    <div class="instructions">
+                        <p class="centered-message">欢迎参加本次心理学实验！</p>
+                    </div>
+                    <div class="input-group">
+                        <p>请输入您的实验编号：</p>
+                        <input type="text" id="participant-id" placeholder="例如: P001">
+                    </div>
+                    <button class="btn" onclick="requestFullscreenAndShowDemographics()">开始实验</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕2: 人口学信息 -->
+        <div id="screen2" class="screen">
+            <div class="center-content">
+                <div class="screen-header">
+                    <h1>基本信息填写</h1>
+                </div>
+                <div class="content-area text-center">
+                    <!-- 原全屏提示已隐藏，使用新的全屏警告 -->
+                    <div class="demographics-form">
+                        <div class="column">
+                            <div class="form-group">
+                                <label for="age">年龄：</label>
+                                <input type="text" id="age" placeholder="请输入您的年龄（18-30之间的整数）" oninput="validateAge(this)">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>性别：</label>
+                                <div class="gender-options">
+                                    <div class="gender-option">
+                                        <input type="radio" id="male" name="gender" value="男">
+                                        <label for="male">男</label>
+                                    </div>
+                                    <div class="gender-option">
+                                        <input type="radio" id="female" name="gender" value="女">
+                                        <label for="female">女</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="major">专业：</label>
+                                <select id="major">
+                                    <option value="">请选择您的专业</option>
+                                    <option value="01哲学">01哲学</option>
+                                    <option value="02经济学">02经济学</option>
+                                    <option value="03法学">03法学</option>
+                                    <option value="04教育学">04教育学</option>
+                                    <option value="05文学">05文学</option>
+                                    <option value="06历史学">06历史学</option>
+                                    <option value="07理学">07理学</option>
+                                    <option value="08工学">08工学</option>
+                                    <option value="09农学">09农学</option>
+                                    <option value="10医学">10医学</option>
+                                    <option value="11军事">11军事</option>
+                                    <option value="12管理学">12管理学</option>
+                                    <option value="13艺术学">13艺术学</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="column">
+                            <div class="form-group">
+                                <label for="education">学历：</label>
+                                <select id="education">
+                                    <option value="">请选择您的学历</option>
+                                    <option value="高中及以下">高中及以下</option>
+                                    <option value="大学专科">大学专科</option>
+                                    <option value="大学本科">大学本科</option>
+                                    <option value="硕士研究生以上">硕士研究生以上</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="health">身心状态：</label>
+                                <select id="health">
+                                    <option value="良好" selected>良好</option>
+                                    <option value="一般">一般</option>
+                                    <option value="较差">较差</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="saveDemographics()">确认并继续</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕3: 实验说明 -->
+        <div id="screen3" class="screen">
+            <div class="center-content">
+                <div class="screen-header">
+                    <h1>实验说明</h1>
+                </div>
+                <div class="content-area text-center">
+                    <!-- 原全屏提示已隐藏，使用新的全屏警告 -->
+                    
+                    <div class="three-column-layout">
+                        <div class="column">
+                            <div class="instructions">
+                                <p><strong>同学，您好！</strong></p>
+                                <p>欢迎参与本次线上心理学行为实验。在本次实验中，您将完成一系列决策任务，主试将依据你的作答情况以及认真程度给予您相应的报酬。您的所有决策都将被严格保密，仅用于学术研究。</p>
+                                
+                                <h3>实验流程：</h3>
+                                <ol>
+                                    <li>填写基本信息</li>
+                                    <li>阅读实验说明</li>
+                                    <li>练习阶段</li>
+                                    <li>正式实验</li>
+                                    <li>填写问卷</li>
+                                    <li>获取报酬</li>
+                                </ol>
+                            </div>
+                        </div>
+                        
+                        <div class="column">
+                            <div class="instructions">
+                                <h3>任务说明：</h3>
+                                <p><strong>任务角色：</strong>在接下来的任务中，您将扮演"提议者"的角色。系统会随机将您与另一位匿名的"回应者"配对。</p>
+                                <p><strong>分配方案：</strong>在每一轮任务中，您和回应者将共同分配一笔<strong>【10元钱】</strong>。在图片呈现结束后，您需要提出一个分配方案，决定如何分配这10元钱，且对方无法拒绝。</p>
+                                
+                                <h3>五种分配方案：</h3>
+                                <ul>
+                                    <li><strong>按键1：</strong> 您得5元，对方得5元</li>
+                                    <li><strong>按键2：</strong> 您得6元，对方得4元</li>
+                                    <li><strong>按键3：</strong> 您得7元，对方得3元</li>
+                                    <li><strong>按键4：</strong> 您得8元，对方得2元</li>
+                                    <li><strong>按键5：</strong> 您得9元，对方得1元</li>
+                                </ul>
+                                 <p>您将完成若干轮类似的决策，并对方案的公平性进行评分。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="column">
+                            <div class="instructions">
+                                <h3>关键提醒：</h3>
+                                <ul>
+                                    <li>将有其他参与者与您共同完成实验。</li>
+                                    <li>请根据您自身的真实想法进行选择，答案没有对错之分。</li>
+                                    <li>在任务过程中，我们还会请您对您提出的分配方案的公平性进行评价。</li>
+                                    <li><strong>特殊说明：</strong>实验结束后，系统将从您完成的所有轮次中随机抽取一轮，并按照您在该轮次的虚拟币作为您的浮动报酬。因此，请认真对待您的每一个决策，因为它将直接关系到您最终能获得的报酬。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="key-instruction" style="margin-top: 20px;">
+                        <p><strong>操作说明：</strong></p>
+                        <p>在练习和正式实验中，请使用键盘数字键进行作答：</p>
+                        <p>按 <kbd>1</kbd> 键：选择"您得5元，对方得5元"</p>
+                        <p>按 <kbd>2</kbd> 键：选择"您得6元，对方得4元"</p>
+                        <p>按 <kbd>3</kbd> 键：选择"您得7元，对方得3元"</p>
+                        <p>按 <kbd>4</kbd> 键：选择"您得8元，对方得2元"</p>
+                        <p>按 <kbd>5</kbd> 键：选择"您得9元，对方得1元"</p>
+                        <p>按 <kbd>空格键</kbd>：继续下一试次</p>
+                    </div>
+                    
+                    <div style="margin-top: 15px;">
+                        <p class="centered-message">如果您已完全理解上述规则且同意开始实验，请点击下方按钮开始练习环节，以熟悉操作流程。</p>
+                        <button class="btn" onclick="startNetwork()">理解，继续</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕4: 网络连接 -->
+        <div id="screen4" class="screen">
+            <div class="center-content">
+                <div class="screen-header">
+                    <h1>正在连接服务器...</h1>
+                </div>
+                <div class="content-area text-center">
+                    <div class="network-connecting">● ● ●</div>
+                    <p class="centered-message">请稍候，正在为您匹配参与者...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕5: 匹配成功 -->
+        <div id="screen5" class="screen">
+            <div class="center-content">
+                <div class="screen-header">
+                    <h1>匹配成功！</h1>
+                </div>
+                <div class="content-area text-center">
+                    <div class="instructions">
+                        <p class="centered-message">您已与 <span id="matched-participant" style="color: var(--primary); font-weight: bold;">XX</span> 号参与者连接成功！</p>
+                    </div>
+                    <button class="btn" onclick="startPractice()">开始练习</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕6: 练习阶段 -->
+        <div id="screen6" class="screen hide-cursor">
+            <div class="center-content">
+                <div class="screen-header">
+                    <h2>练习阶段</h2>
+                </div>
+                <div class="content-area text-center">
+                    <div class="trial-counter">练习试次</div>
+                    
+                    <!-- 注视点 - 修改为居中对齐 -->
+                    <div id="practice-fixation" class="fixation-container">
+                        <div class="cross">+</div>
+                    </div>
+                    
+                    <!-- 分配方案选择 -->
+                    <div id="practice-proposal-choice" style="display: none;">
+                        <h2>请选择分配方案</h2>
+                        <div class="proposal-options" id="practice-proposal-options">
+                            <!-- 五个分配方案选项 -->
+                            <div class="proposal-option" data-choice="1">
+                                <span class="proposal-key">1</span>
+                                <div class="proposal-details">
+                                    您得 <span class="proposal-self">5</span> 元<br>
+                                    对方得 <span class="proposal-other">5</span> 元
+                                </div>
+                            </div>
+                            <div class="proposal-option" data-choice="2">
+                                <span class="proposal-key">2</span>
+                                <div class="proposal-details">
+                                    您得 <span class="proposal-self">6</span> 元<br>
+                                    对方得 <span class="proposal-other">4</span> 元
+                                </div>
+                            </div>
+                            <div class="proposal-option" data-choice="3">
+                                <span class="proposal-key">3</span>
+                                <div class="proposal-details">
+                                    您得 <span class="proposal-self">7</span> 元<br>
+                                    对方得 <span class="proposal-other">3</span> 元
+                                </div>
+                            </div>
+                            <div class="proposal-option" data-choice="4">
+                                <span class="proposal-key">4</span>
+                                <div class="proposal-details">
+                                    您得 <span class="proposal-self">8</span> 元<br>
+                                    对方得 <span class="proposal-other">2</span> 元
+                                </div>
+                            </div>
+                            <div class="proposal-option" data-choice="5">
+                                <span class="proposal-key">5</span>
+                                <div class="proposal-details">
+                                    您得 <span class="proposal-self">9</span> 元<br>
+                                    对方得 <span class="proposal-other">1</span> 元
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proposal-instruction">
+                            请按数字键 <kbd>1-5</kbd> 选择分配方案
+                        </div>
+                    </div>
+                    
+                    <!-- 选择的分配方案反馈 -->
+                    <div id="practice-feedback" style="display: none;">
+                        <h2>您选择的方案</h2>
+                        <div class="proposal-display" id="practice-feedback-text">
+                            您选择：您得5元，对方得5元
+                        </div>
+                    </div>
+                    
+                    <!-- 公平性评分 -->
+                    <div id="practice-fairness-rating" style="display: none;">
+                        <h2>公平性评价</h2>
+                        <div class="fairness-scale">
+                            <p>您觉得刚才您提出的分配方案：</p>
+                            <div class="scale-options">
+                                <div class="scale-option">
+                                    <input type="radio" id="practice-fairness1" name="practice-fairness" value="1">
+                                    <label for="practice-fairness1">1<br>非常不公平</label>
+                                </div>
+                                <div class="scale-option">
+                                    <input type="radio" id="practice-fairness2" name="practice-fairness" value="2">
+                                    <label for="practice-fairness2">2</label>
+                                </div>
+                                <div class="scale-option">
+                                    <input type="radio" id="practice-fairness3" name="practice-fairness" value="3">
+                                    <label for="practice-fairness3">3</label>
+                                </div>
+                                <div class="scale-option">
+                                    <input type="radio" id="practice-fairness4" name="practice-fairness" value="4">
+                                    <label for="practice-fairness4">4</label>
+                                </div>
+                                <div class="scale-option">
+                                    <input type="radio" id="practice-fairness5" name="practice-fairness" value="5">
+                                    <label for="practice-fairness5">5</label>
+                                </div>
+                                <div class="scale-option">
+                                    <input type="radio" id="practice-fairness6" name="practice-fairness" value="6">
+                                    <label for="practice-fairness6">6</label>
+                                </div>
+                                <div class="scale-option">
+                                    <input type="radio" id="practice-fairness7" name="practice-fairness" value="7">
+                                    <label for="practice-fairness7">7<br>非常公平</label>
+                                </div>
+                            </div>
+                            <div class="key-instruction">
+                                请按数字键 <kbd>1-7</kbd> 评分，按 <kbd>空格键</kbd> 继续
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕7: 练习结束 -->
+        <div id="screen7" class="screen">
+            <div class="center-content">
+                <div class="screen-header">
+                    <h2>练习结束</h2>
+                </div>
+                <div class="content-area text-center">
+                    <div class="instructions">
+                        <p class="centered-message">您已完成练习阶段！</p>
+                        <p>现在您已熟悉实验流程和键盘操作。</p>
+                        <p>接下来将进入正式实验，共40个试次。</p>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn" onclick="startExperiment()">开始正式实验 (空格键)</button>
+                        <button class="btn btn-secondary" onclick="restartPractice()">重新练习</button>
+                    </div>
+                    <p class="keyboard-hint">提示：您也可以按空格键开始正式实验</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕8: 正式实验 -->
+        <div id="screen8" class="screen hide-cursor">
+            <div class="center-content">
+                <div class="screen-header">
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    <div class="trial-counter" id="trial-counter">试次 1 / 40</div>
+                </div>
+                <div class="content-area text-center">
+                    <!-- 注视点 - 修改为居中对齐 -->
+                    <div id="fixation" class="fixation-container">
+                        <div class="cross">+</div>
+                    </div>
+                    
+                    <!-- 分配方案选择 -->
+                    <div id="proposal-choice" style="display: none;">
+                        <h2>请选择分配方案</h2>
+                        <div class="proposal-options" id="proposal-options">
+                            <!-- 五个分配方案选项 -->
+                            <div class="proposal-option" data-choice="1">
+                                <span class="proposal-key">1</span>
+                                <div class="proposal-details">
+                                    您得 <span class="proposal-self">5</span> 元<br>
+                                    对方得 <span class="proposal-other">5</span> 元
+                                </div>
+                            </div>
+                            <div class="proposal-option" data-choice="2">
+                                <span class="proposal-key">2</span>
+                                <div class="proposal-details">
+                                    您得 <span class="proposal-self">6</span> 元<br>
+                                    对方得 <span class="proposal-other">4</span> 元
+                                </div>
+                            </div>
+                            <div class="proposal-option" data-choice="3">
+                                <span class="proposal-key">3</span>
+                                <div class="proposal-details">
+                                    您得 <span class="proposal-self">7</span> 元<br>
+                                    对方得 <span class="proposal-other">3</span> 元
+                                </div>
+                            </div>
+                            <div class="proposal-option" data-choice="4">
+                                <span class="proposal-key">4</span>
+                                <div class="proposal-details">
+                                    您得 <span class="proposal-self">8</span> 元<br>
+                                    对方得 <span class="proposal-other">2</span> 元
+                                </div>
+                            </div>
+                            <div class="proposal-option" data-choice="5">
+                                <span class="proposal-key">5</span>
+                                <div class="proposal-details">
+                                    您得 <span class="proposal-self">9</span> 元<br>
+                                    对方得 <span class="proposal-other">1</span> 元
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proposal-instruction">
+                            请按数字键 <kbd>1-5</kbd> 选择分配方案
+                        </div>
+                    </div>
+                    
+                    <!-- 选择的分配方案反馈 -->
+                    <div id="feedback" style="display: none;">
+                        <h2>您选择的方案</h2>
+                        <div class="proposal-display" id="trial-feedback">
+                            您选择：您得5元，对方得5元
+                        </div>
+                    </div>
+                    
+                    <!-- 公平性评分 -->
+                    <div id="fairness-rating" style="display: none;">
+                        <h2>公平性评价</h2>
+                        <div class="fairness-scale">
+                            <p>您觉得刚才您提出的分配方案：</p>
+                            <div class="scale-options">
+                                <div class="scale-option">
+                                    <input type="radio" id="fairness1" name="fairness" value="1">
+                                    <label for="fairness1">1<br>非常不公平</label>
+                                </div>
+                                <div class="scale-option">
+                                    <input type="radio" id="fairness2" name="fairness" value="2">
+                                    <label for="fairness2">2</label>
+                                </div>
+                                <div class="scale-option">
+                                    <input type="radio" id="fairness3" name="fairness" value="3">
+                                    <label for="fairness3">3</label>
+                                </div>
+                                <div class="scale-option">
+                                    <input type="radio" id="fairness4" name="fairness" value="4">
+                                    <label for="fairness4">4</label>
+                                </div>
+                                <div class="scale-option">
+                                    <input type="radio" id="fairness5" name="fairness" value="5">
+                                    <label for="fairness5">5</label>
+                                </div>
+                                <div class="scale-option">
+                                    <input type="radio" id="fairness6" name="fairness" value="6">
+                                    <label for="fairness6">6</label>
+                                </div>
+                                <div class="scale-option">
+                                    <input type="radio" id="fairness7" name="fairness" value="7">
+                                    <label for="fairness7">7<br>非常公平</label>
+                                </div>
+                            </div>
+                            <div class="key-instruction">
+                                请按数字键 <kbd>1-7</kbd> 评分，按 <kbd>空格键</kbd> 继续
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕9: 休息提示 -->
+        <div id="screen9" class="screen">
+            <div class="center-content break-screen">
+                <div class="screen-header">
+                    <h1>休息提示</h1>
+                </div>
+                <div class="content-area text-center">
+                    <div class="instructions break-instructions mx-auto max-w-2xl">
+                        <p class="centered-message">您已经完成了前20个试次！</p>
+                        <p>您可以选择休息2分钟，或者直接继续实验。</p>
+                        <p>如果需要休息，请等待倒计时结束；</p>
+                        <p>如果不需要休息，请按空格键立即继续。</p>
+                    </div>
+                    
+                    <div class="break-timer" id="break-timer">120</div>
+                    
+                    <div class="key-instruction mt-4">
+                        <p>按 <kbd>空格键</kbd> 跳过休息，立即继续</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕10: 理解测试 -->
+        <div id="screen10" class="screen">
+            <div class="center-content">
+                <div class="screen-header">
+                    <h1>理解测试</h1>
+                </div>
+                <div class="content-area text-center">
+                    <p class="centered-message">请回答以下问题，以确保您完全理解实验规则。</p>
+                    
+                    <div class="comprehension-question">
+                        <!-- 修改后的第一题 -->
+                        <h3>在这个任务中，您扮演什么角色？</h3>
+                        <div class="comprehension-options">
+                            <div class="comprehension-option">
+                                <input type="radio" id="q1a" name="q1" value="A">
+                                <label for="q1a">A. 回应者：我可以对分配方案说"接受"或"拒绝"。</label>
+                            </div>
+                            <div class="comprehension-option">
+                                <input type="radio" id="q1b" name="q1" value="B">
+                                <label for="q1b">B. 提议者：我决定如何分配钱，对方必须接受我的方案。</label>
+                            </div>
+                            <div class="comprehension-option">
+                                <input type="radio" id="q1c" name="q1" value="C">
+                                <label for="q1c">C. 第三方：我观察别人的分配并决定是否惩罚。</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="comprehension-question">
+                        <!-- 修改后的第二题 -->
+                        <h3>如果您决定将10元钱按【自己得9元，对方得1元】的方案分配，最终会发生什么？</h3>
+                        <div class="comprehension-options">
+                            <div class="comprehension-option">
+                                <input type="radio" id="q2a" name="q2" value="A">
+                                <label for="q2a">A. 对方很可能会拒绝这个方案，我们什么都得不到。</label>
+                            </div>
+                            <div class="comprehension-option">
+                                <input type="radio" id="q2b" name="q2" value="B">
+                                <label for="q2b">B. 方案将生效，您得到9元，对方得到1元。</label>
+                            </div>
+                            <div class="comprehension-option">
+                                <input type="radio" id="q2c" name="q2" value="C">
+                                <label for="q2c">C. 系统会判定您的方案不公平，并自动将其调整为公平分配。</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn" onclick="checkComprehension()">提交答案</button>
+                    <p class="keyboard-hint">提示：您也可以使用空格键提交答案</p>
+                    
+                    <!-- 理解测试失败提示 -->
+                    <div id="comprehension-failed" class="comprehension-failed" style="display: none;">
+                        <h3>理解测试未通过</h3>
+                        <p>您未能正确回答所有问题。请仔细阅读实验说明后重新作答。</p>
+                        <div class="response-keys">
+                            <button class="btn" onclick="retryComprehension()">重新作答</button>
+                            <button class="btn" onclick="restartExperiment()" style="background: var(--danger);">放弃实验</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕11: 不确定性容忍度量表 -->
+        <div id="screen11" class="screen">
+            <div class="center-content">
+                <div class="screen-header">
+                    <h1>不确定性容忍度量表</h1>
+                </div>
+                <div class="content-area text-center">
+                    <p class="centered-message">请仔细阅读下面的句子，选择在最符合您情况的选项上打"√"。其中1表示"完全不符合",2表示"比较不符合",3表示"有点符合",4表示"比较符合",5表示"完全符合"。(请不要多选或漏选)</p>
+                    
+                    <table class="questionnaire-table">
+                        <thead>
+                            <tr>
+                                <th width="60%">题目</th>
+                                <th>1<br>完全不符合</th>
+                                <th>2<br>比较不符合</th>
+                                <th>3<br>有点符合</th>
+                                <th>4<br>比较符合</th>
+                                <th>5<br>完全符合</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="text-align: left;">1. 无法预料的事情会让我心烦意乱。</td>
+                                <td><input type="radio" name="q1" value="1"></td>
+                                <td><input type="radio" name="q1" value="2"></td>
+                                <td><input type="radio" name="q1" value="3"></td>
+                                <td><input type="radio" name="q1" value="4"></td>
+                                <td><input type="radio" name="q1" value="5"></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">2. 如果不能拥有我所需要的全部信息，我会很沮丧。</td>
+                                <td><input type="radio" name="q2" value="1"></td>
+                                <td><input type="radio" name="q2" value="2"></td>
+                                <td><input type="radio" name="q2" value="3"></td>
+                                <td><input type="radio" name="q2" value="4"></td>
+                                <td><input type="radio" name="q2" value="5"></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">3. 不确定性让我过得不好。</td>
+                                <td><input type="radio" name="q3" value="1"></td>
+                                <td><input type="radio" name="q3" value="2"></td>
+                                <td><input type="radio" name="q3" value="3"></td>
+                                <td><input type="radio" name="q3" value="4"></td>
+                                <td><input type="radio" name="q3" value="5"></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">4. 我做事总会未雨绸缪，以避免措手不及。</td>
+                                <td><input type="radio" name="q4" value="1"></td>
+                                <td><input type="radio" name="q4" value="2"></td>
+                                <td><input type="radio" name="q4" value="3"></td>
+                                <td><input type="radio" name="q4" value="4"></td>
+                                <td><input type="radio" name="q4" value="5"></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">5. 即使有最好的计划，一个小意外也能搞砸我的全盘计划。</td>
+                                <td><input type="radio" name="q5" value="1"></td>
+                                <td><input type="radio" name="q5" value="2"></td>
+                                <td><input type="radio" name="q5" value="3"></td>
+                                <td><input type="radio" name="q5" value="4"></td>
+                                <td><input type="radio" name="q5" value="5"></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">6. 当到了采取行动的时候，不确定性会让我停滞不前。</td>
+                                <td><input type="radio" name="q6" value="1"></td>
+                                <td><input type="radio" name="q6" value="2"></td>
+                                <td><input type="radio" name="q6" value="3"></td>
+                                <td><input type="radio" name="q6" value="4"></td>
+                                <td><input type="radio" name="q6" value="5"></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">7. 当我感到不确定时，我就不能很好地表现自己。</td>
+                                <td><input type="radio" name="q7" value="1"></td>
+                                <td><input type="radio" name="q7" value="2"></td>
+                                <td><input type="radio" name="q7" value="3"></td>
+                                <td><input type="radio" name="q7" value="4"></td>
+                                <td><input type="radio" name="q7" value="5"></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">8. 我总是想知道我的未来是什么样子的。</td>
+                                <td><input type="radio" name="q8" value="1"></td>
+                                <td><input type="radio" name="q8" value="2"></td>
+                                <td><input type="radio" name="q8" value="3"></td>
+                                <td><input type="radio" name="q8" value="4"></td>
+                                <td><input type="radio" name="q8" value="5"></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">9. 我无法忍受突发状况。</td>
+                                <td><input type="radio" name="q9" value="1"></td>
+                                <td><input type="radio" name="q9" value="2"></td>
+                                <td><input type="radio" name="q9" value="3"></td>
+                                <td><input type="radio" name="q9" value="4"></td>
+                                <td><input type="radio" name="q9" value="5"></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">10. 一点点的疑惑都会阻止我行动。</td>
+                                <td><input type="radio" name="q10" value="1"></td>
+                                <td><input type="radio" name="q10" value="2"></td>
+                                <td><input type="radio" name="q10" value="3"></td>
+                                <td><input type="radio" name="q10" value="4"></td>
+                                <td><input type="radio" name="q10" value="5"></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">11. 在做事之前，我应该能够规划好一切。</td>
+                                <td><input type="radio" name="q11" value="1"></td>
+                                <td><input type="radio" name="q11" value="2"></td>
+                                <td><input type="radio" name="q11" value="3"></td>
+                                <td><input type="radio" name="q11" value="4"></td>
+                                <td><input type="radio" name="q11" value="5"></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">12. 我必须摆脱所有不确定的情形。</td>
+                                <td><input type="radio" name="q12" value="1"></td>
+                                <td><input type="radio" name="q12" value="2"></td>
+                                <td><input type="radio" name="q12" value="3"></td>
+                                <td><input type="radio" name="q12" value="4"></td>
+                                <td><input type="radio" name="q12" value="5"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <button class="btn" onclick="saveQuestionnaire()">提交问卷</button>
+                    <p class="keyboard-hint">提示：您也可以使用空格键提交问卷</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕12: 作答地点选择 -->
+        <div id="screen12" class="screen">
+            <div class="center-content">
+                <div class="screen-header">
+                    <h1>作答地点与环境评估</h1>
+                </div>
+                <div class="content-area text-center">
+                    <div class="instructions">
+                        <p class="centered-message">请选择您当前作答的地点：</p>
+                    </div>
+                    
+                    <div class="location-form card">
+                        <h3 class="card-title">作答地点</h3>
+                        <div class="form-group">
+                            <label for="location">作答地点：</label>
+                            <select id="location" class="form-control" onchange="toggleOtherLocation()">
+                                <option value="">请选择您的作答地点</option>
+                                <option value="教室">教室</option>
+                                <option value="公司单位">公司单位</option>
+                                <option value="自习室">自习室</option>
+                                <option value="图书馆">图书馆</option>
+                                <option value="宿舍">宿舍</option>
+                                <option value="家里">家里</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                        
+                        <div id="other-location-input" class="other-location-input">
+                            <div class="form-group">
+                                <label for="other-location">请填写您的作答地点：</label>
+                                <input type="text" id="other-location" class="form-control" placeholder="请输入您的作答地点">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 新增：到陌生地方频率问题 -->
+                    <div class="frequency-question card">
+                        <h3 class="card-title">您到陌生地方的频率是：</h3>
+                        <div class="frequency-scale">
+                            <div class="frequency-option">
+                                <input type="radio" id="frequency1" name="unfamiliarFrequency" value="从不">
+                                <label for="frequency1">从不<br><small>几乎不去陌生地方</small></label>
+                            </div>
+                            <div class="frequency-option">
+                                <input type="radio" id="frequency2" name="unfamiliarFrequency" value="很少">
+                                <label for="frequency2">很少<br><small>每年几次</small></label>
+                            </div>
+                            <div class="frequency-option">
+                                <input type="radio" id="frequency3" name="unfamiliarFrequency" value="偶尔">
+                                <label for="frequency3">偶尔<br><small>每月1-2次</small></label>
+                            </div>
+                            <div class="frequency-option">
+                                <input type="radio" id="frequency4" name="unfamiliarFrequency" value="经常">
+                                <label for="frequency4">经常<br><small>每周几次</small></label>
+                            </div>
+                            <div class="frequency-option">
+                                <input type="radio" id="frequency5" name="unfamiliarFrequency" value="总是">
+                                <label for="frequency5">总是<br><small>几乎每天都在陌生地方</small></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 环境评估量表 -->
+                    <div class="environment-assessment card">
+                        <h3 class="card-title">环境评估</h3>
+                        <p class="centered-message">请评估您当前作答环境：</p>
+                        
+                        <div class="assessment-question">
+                            <p>您对当前作答环境的熟悉程度：</p>
+                            <div class="assessment-scale">
+                                <div class="assessment-option">
+                                    <input type="radio" id="familiarity1" name="familiarity" value="1">
+                                    <label for="familiarity1">1<br>非常不熟悉</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="familiarity2" name="familiarity" value="2">
+                                    <label for="familiarity2">2</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="familiarity3" name="familiarity" value="3">
+                                    <label for="familiarity3">3</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="familiarity4" name="familiarity" value="4">
+                                    <label for="familiarity4">4</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="familiarity5" name="familiarity" value="5">
+                                    <label for="familiarity5">5</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="familiarity6" name="familiarity" value="6">
+                                    <label for="familiarity6">6</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="familiarity7" name="familiarity" value="7">
+                                    <label for="familiarity7">7<br>非常熟悉</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="assessment-question">
+                            <p>您对当前作答环境的愉悦程度：</p>
+                            <div class="assessment-scale">
+                                <div class="assessment-option">
+                                    <input type="radio" id="pleasure1" name="pleasure" value="1">
+                                    <label for="pleasure1">1<br>非常不愉悦</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="pleasure2" name="pleasure" value="2">
+                                    <label for="pleasure2">2</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="pleasure3" name="pleasure" value="3">
+                                    <label for="pleasure3">3</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="pleasure4" name="pleasure" value="4">
+                                    <label for="pleasure4">4</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="pleasure5" name="pleasure" value="5">
+                                    <label for="pleasure5">5</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="pleasure6" name="pleasure" value="6">
+                                    <label for="pleasure6">6</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="pleasure7" name="pleasure" value="7">
+                                    <label for="pleasure7">7<br>非常愉悦</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="assessment-question">
+                            <p>您对当前作答环境的唤醒程度：</p>
+                            <div class="assessment-scale">
+                                <div class="assessment-option">
+                                    <input type="radio" id="arousal1" name="arousal" value="1">
+                                    <label for="arousal1">1<br>非常平静</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="arousal2" name="arousal" value="2">
+                                    <label for="arousal2">2</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="arousal3" name="arousal" value="3">
+                                    <label for="arousal3">3</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="arousal4" name="arousal" value="4">
+                                    <label for="arousal4">4</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="arousal5" name="arousal" value="5">
+                                    <label for="arousal5">5</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="arousal6" name="arousal" value="6">
+                                    <label for="arousal6">6</label>
+                                </div>
+                                <div class="assessment-option">
+                                    <input type="radio" id="arousal7" name="arousal" value="7">
+                                    <label for="arousal7">7<br>非常兴奋</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn" onclick="saveLocation()">确认并继续</button>
+                    </div>
+                    <p class="keyboard-hint">提示：您也可以使用空格键确认并继续</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕13: 下载数据发给主试 -->
+        <div id="screen13" class="screen">
+            <div class="center-content">
+                <div class="screen-header">
+                    <h1>实验完成，感谢您的参与！</h1>
+                </div>
+                <div class="content-area text-center">
+                    <div class="instructions">
+                        <p class="centered-message">请下载您的实验数据文件：</p>
+                        
+                        <!-- 新增：重要提示 -->
+                        <div class="important-hint">
+                            <p><strong>重要提示：</strong></p>
+                            <p>为了避免网络不稳定导致站内数据发送失败，请下载实验数据发给主试，作为领取报酬的依据。</p>
+                            <p>请您务必将下载的数据文件发送给主试！</p>
+                        </div>
+                        
+                        <button class="btn" onclick="downloadData()">下载实验数据</button>
+                        <p class="keyboard-hint">提示：您也可以使用空格键下载数据</p>
+                    </div>
+                    <div id="download-status" style="margin: 20px 0; padding: 12px; border-radius: 12px; background-color: #e9f7ef; color: #2d5016; display: none; font-size: 0.95rem;">
+                        数据下载成功！
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 屏幕14: 最终完成页面 -->
+        <div id="screen14" class="screen">
+            <div class="center-content">
+                <div class="screen-header">
+                    <h1>实验已完成</h1>
+                </div>
+                <div class="content-area text-center">
+                    <div class="instructions">
+                        <p class="centered-message">感谢您的参与！祝您生活愉快！</p>
+                    </div>
+                    
+                    <!-- 新增：实验完成提示和退出指南 -->
+                    <div class="completion-hint">
+                        <h3>实验完成提示</h3>
+                        <p><strong>实验已完成，您现在可以安全地关闭此标签页以退出实验程序。</strong></p>
+                        <p>若实验中遇到任何问题，记得及时向主试说明，避免影响实验结果影响被试费发放。</p>
+                        <p>在此页面，您可以选择退出全屏模式（按F11键或点击右上角的全屏按钮）。</p>
+                    </div>
+                    
+                    <div class="keyboard-exit-hint">
+                        <p><strong>退出全屏提示：</strong>按 <kbd>F11</kbd> 键或点击右上角的 <kbd>⛶</kbd> 按钮退出全屏模式。</p>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <button class="btn btn-secondary" onclick="exitFullscreen()">退出全屏</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 图片呈现容器 - 独立于其他屏幕 -->
+        <div id="image-presentation" class="image-container" style="display: none;">
+            <img id="trial-image" class="trial-image" src="" alt="实验图片">
+            <!-- 添加练习阶段文字显示 -->
+            <div id="practice-text" class="practice-text" style="display: none;">图片</div>
+        </div>
+    </div>
+
+    <script>
+        // 实验数据存储
+        const experimentData = {
+            participantId: '',
+            demographics: {
+                age: '',
+                gender: '',
+                major: '',
+                education: '',
+                health: ''
+            },
+            comprehension: {
+                q1: '',
+                q2: '',
+                q1Correct: false,
+                q2Correct: false,
+                attempts: 0
+            },
+            uncertaintyTolerance: {},
+            location: '',
+            unfamiliarFrequency: '',
+            environmentAssessment: {
+                familiarity: '',
+                pleasure: '',
+                arousal: ''
+            },
+            matchedParticipant: 0,
+            practiceTrials: [],
+            trials: [],
+            currentTrial: 0,
+            startTime: null,
+            endTime: null,
+            totalTime: 0,
+            formalExperimentStartTime: null,
+            formalExperimentEndTime: null,
+            formalExperimentDuration: 0,
+            breakChoice: 0,
+            lastActivityTime: null,
+            inactivityTimer: null,
+            isFullscreen: false,
+            fullscreenWarningShown: false,
+            trialSequence: [],
+            breakTimer: null,
+            breakTimeLeft: 120
+        };
+        
+        // 独裁者实验的五种分配方案
+        const dictatorProposals = [
+            { self: 5, other: 5, choice: 1, type: 'fair' },
+            { self: 6, other: 4, choice: 2, type: 'slightly_fair' },
+            { self: 7, other: 3, choice: 3, type: 'neutral' },
+            { self: 8, other: 2, choice: 4, type: 'slightly_unfair' },
+            { self: 9, other: 1, choice: 5, type: 'unfair' }
+        ];
+        
+        // 图片分组配置
+        const imageGroups = {
+            familiar: {
+                name: "familiar",
+                images: Array.from({length: 20}, (_, i) => `sx${i+1}.jpg`)
+            },
+            unfamiliar: {
+                name: "unfamiliar",
+                images: Array.from({length: 20}, (_, i) => `ms${i+1}.jpg`)
+            }
+        };
+        
+        // 创建伪随机试次序列
+        function createFixedTrialSequence() {
+            let sequence = [];
+            
+            // 创建所有试次的基础列表
+            let allTrials = [];
+            
+            // 为每个图片组创建试次
+            Object.keys(imageGroups).forEach(groupKey => {
+                const group = imageGroups[groupKey];
+                
+                // 每个图片组20个试次
+                // 每个分配方案类型出现4次（5种方案 × 4次 = 20次）
+                let proposals = [];
+                
+                // 每种分配方案出现4次
+                for (let i = 0; i < 4; i++) {
+                    proposals.push(...dictatorProposals.map(p => ({...p})));
+                }
+                
+                // 使用被试ID作为种子创建伪随机序列
+                const participantSeed = experimentData.participantId || 'default_seed';
+                let rng = new Math.seedrandom(participantSeed + groupKey);
+                
+                // 打乱方案顺序
+                proposals = shuffleArray(proposals, rng);
+                
+                // 打乱图片顺序
+                let shuffledImages = shuffleArray([...group.images], rng);
+                
+                // 将打乱后的方案与打乱后的图片一一对应
+                proposals.forEach((proposal, index) => {
+                    allTrials.push({
+                        ...proposal,
+                        imagePath: shuffledImages[index],
+                        imageGroup: groupKey,
+                        imageGroupName: group.name,
+                        imageGroupCode: groupKey === 'familiar' ? 0 : 1,
+                        trialId: allTrials.length + 1,
+                        isPractice: false,
+                        originalIndex: allTrials.length,
+                        sequenceIndex: allTrials.length // 添加序列索引
+                    });
+                });
+            });
+            
+            // 使用被试ID作为种子创建伪随机序列
+            const participantSeed = experimentData.participantId || 'default_seed';
+            let rng = new Math.seedrandom(participantSeed);
+            
+            // 打乱所有试次顺序
+            sequence = shuffleArray(allTrials, rng);
+            
+            console.log('生成的试次序列:', sequence);
+            return sequence;
+        }
+        
+        // 使用随机数生成器的洗牌算法
+        function shuffleArray(array, rng) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(rng() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+        
+        // 屏幕切换函数
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+                // 移除隐藏光标类
+                screen.classList.remove('hide-cursor');
+            });
+            
+            document.getElementById(screenId).classList.add('active');
+            
+            // 屏幕1、屏幕13和屏幕14不检查全屏状态，允许退出全屏
+            if (screenId !== 'screen1' && screenId !== 'screen13' && screenId !== 'screen14') {
+                // 延迟检查，确保状态更新完成
+                setTimeout(() => {
+                    checkFullscreen();
+                }, 100);
+            } else {
+                // 屏幕1、屏幕13和屏幕14隐藏全屏警告，允许退出全屏
+                document.getElementById('fullscreen-overlay').style.display = 'none';
+                document.getElementById('fullscreen-warning').style.display = 'none';
+                experimentData.fullscreenWarningShown = false;
+            }
+            
+            // 重置活动时间
+            resetInactivityTimer();
+            
+            // 如果是理解测试失败，不启动倒计时
+            if (screenId === 'screen10' && experimentData.comprehension.attempts === 1) {
+                // 删除倒计时功能
+                document.getElementById('countdown-timer').style.display = 'none';
+            } else {
+                // 隐藏倒计时
+                document.getElementById('countdown-timer').style.display = 'none';
+            }
+            
+            // 如果是休息屏幕，启动休息计时器
+            if (screenId === 'screen9') {
+                startBreakTimer();
+            } else if (experimentData.breakTimer) {
+                // 如果离开休息屏幕，清除计时器
+                clearInterval(experimentData.breakTimer);
+                experimentData.breakTimer = null;
+            }
+        }
+        
+        // 启动休息计时器
+        function startBreakTimer() {
+            experimentData.breakTimeLeft = 120;
+            document.getElementById('break-timer').textContent = experimentData.breakTimeLeft;
+            
+            experimentData.breakTimer = setInterval(() => {
+                experimentData.breakTimeLeft--;
+                document.getElementById('break-timer').textContent = experimentData.breakTimeLeft;
+                
+                if (experimentData.breakTimeLeft <= 0) {
+                    clearInterval(experimentData.breakTimer);
+                    // 休息结束，记录休息选择为8（没跳过休息）
+                    experimentData.breakChoice = 8;
+                    continueAfterBreak();
+                }
+            }, 1000);
+        }
+        
+        // 跳过休息
+        function skipBreak() {
+            if (experimentData.breakTimer) {
+                clearInterval(experimentData.breakTimer);
+                experimentData.breakTimer = null;
+            }
+            // 记录休息选择为7（跳过休息）
+            experimentData.breakChoice = 7;
+            continueAfterBreak();
+        }
+        
+        // 休息后继续
+        function continueAfterBreak() {
+            // 隐藏休息屏
+            showScreen('screen8');
+            // 从第 21 条试次开始（索引 20）
+            runTrial(20);
+        }
+        
+        // 检查全屏状态
+        function checkFullscreen() {
+            // 检查当前屏幕是否为屏幕14，如果是则不显示全屏警告
+            const currentScreen = document.querySelector('.screen.active');
+            if (currentScreen && currentScreen.id === 'screen14') {
+                // 屏幕14不检查全屏状态，直接隐藏警告
+                document.getElementById('fullscreen-overlay').style.display = 'none';
+                document.getElementById('fullscreen-warning').style.display = 'none';
+                experimentData.fullscreenWarningShown = false;
+                return true;
+            }
+            
+            const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || 
+                                  document.mozFullScreenElement || document.msFullscreenElement);
+            
+            experimentData.isFullscreen = isFullscreen;
+            
+            // 显示或隐藏全屏警告
+            if (!isFullscreen && !experimentData.fullscreenWarningShown) {
+                // 显示全屏警告
+                document.getElementById('fullscreen-overlay').style.display = 'block';
+                document.getElementById('fullscreen-warning').style.display = 'block';
+                experimentData.fullscreenWarningShown = true;
+            } else if (isFullscreen) {
+                // 隐藏全屏警告
+                document.getElementById('fullscreen-overlay').style.display = 'none';
+                document.getElementById('fullscreen-warning').style.display = 'none';
+                experimentData.fullscreenWarningShown = false;
+            }
+            
+            return isFullscreen;
+        }
+        
+        // 强制全屏
+        function forceFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+        
+        // 退出全屏
+        function exitFullscreen() {
+            const exitFullscreen = document.exitFullscreen ||
+                                 document.webkitExitFullscreen ||
+                                 document.mozCancelFullScreen ||
+                                 document.msExitFullscreen;
+            
+            if (exitFullscreen) {
+                exitFullscreen.call(document);
+            }
+        }
+        
+        // 年龄验证函数
+        function validateAge(input) {
+            // 只允许输入数字
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+        
+        // 全屏功能
+        function toggleFullscreen() {
+            // 检查当前屏幕，如果是屏幕14则允许退出全屏
+            const currentScreen = document.querySelector('.screen.active');
+            const isScreen14 = currentScreen && currentScreen.id === 'screen14';
+            
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && 
+                !document.mozFullScreenElement && !document.msFullscreenElement) {
+                
+                // 尝试多种全屏方法以确保兼容性
+                const requestFullscreen = document.documentElement.requestFullscreen ||
+                                        document.documentElement.webkitRequestFullscreen ||
+                                        document.documentElement.mozRequestFullScreen ||
+                                        document.documentElement.msRequestFullscreen;
+                
+                if (requestFullscreen) {
+                    requestFullscreen.call(document.documentElement).catch(err => {
+                        console.error(`全屏请求错误: ${err.message}`);
+                        // 如果全屏失败，显示提示
+                        showFullscreenError();
+                    });
+                } else {
+                    showFullscreenError();
+                }
+            } else {
+                // 退出全屏
+                exitFullscreen();
+                
+                // 如果是屏幕14，不显示警告
+                if (isScreen14) {
+                    document.getElementById('fullscreen-overlay').style.display = 'none';
+                    document.getElementById('fullscreen-warning').style.display = 'none';
+                    experimentData.fullscreenWarningShown = false;
+                }
+            }
+        }
+        
+        // 显示全屏错误提示
+        function showFullscreenError() {
+            alert('无法进入全屏模式，请手动按F11键或使用浏览器的全屏功能。');
+        }
+        
+        // 全屏并显示人口学信息
+        function requestFullscreenAndShowDemographics() {
+            const participantId = document.getElementById('participant-id').value;
+            if (!participantId) {
+                alert('请输入您的实验编号');
+                return;
+            }
+            
+            experimentData.participantId = participantId;
+            
+            // 尝试进入全屏模式
+            toggleFullscreen();
+            
+            // 无论全屏是否成功，都继续显示下一个屏幕
+            showScreen('screen2');
+            
+            // 启动全屏状态持续检查
+            startFullscreenCheck();
+        }
+        
+        // 启动全屏状态持续检查
+        function startFullscreenCheck() {
+            // 每500ms检查一次全屏状态
+            setInterval(checkFullscreen, 500);
+        }
+        
+        // 保存人口学信息
+        function saveDemographics() {
+            const age = document.getElementById('age').value;
+            const gender = document.querySelector('input[name="gender"]:checked');
+            const major = document.getElementById('major').value;
+            const education = document.getElementById('education').value;
+            const health = document.getElementById('health').value;
+            
+            if (!age) {
+                alert('请输入您的年龄');
+                return;
+            }
+            
+            const ageNum = parseInt(age);
+            if (ageNum < 18 || ageNum > 30) {
+                alert('年龄必须在18-30岁之间');
+                return;
+            }
+            
+            if (!gender) {
+                alert('请选择您的性别');
+                return;
+            }
+            
+            if (!major) {
+                alert('请选择您的专业');
+                return;
+            }
+            
+            if (!education) {
+                alert('请选择您的学历');
+                return;
+            }
+            
+            // 保存人口学信息
+            experimentData.demographics = {
+                age: age,
+                gender: gender.value,
+                major: major,
+                education: education,
+                health: health
+            };
+            
+            experimentData.startTime = new Date();
+            
+            // 创建固定的试次序列
+            experimentData.trialSequence = createFixedTrialSequence();
+            
+            console.log('生成的试次序列:', experimentData.trialSequence);
+            
+            showScreen('screen3');
+        }
+        
+        function startNetwork() {
+            showScreen('screen4');
+            
+            // 模拟网络连接延迟
+            setTimeout(() => {
+                // 生成不与被试编号重合的参与者编号
+                const participantIdNum = parseInt(experimentData.participantId.replace(/\D/g, '')) || 0;
+                let matchedId;
+                do {
+                    matchedId = Math.floor(Math.random() * 36) + 1;
+                } while (matchedId === participantIdNum);
+                
+                experimentData.matchedParticipant = matchedId;
+                document.getElementById('matched-participant').textContent = experimentData.matchedParticipant;
+                showScreen('screen5');
+            }, 2000);
+        }
+        
+        // 练习阶段变量
+        let practiceTrialIndex = 0;
+        const practiceTrials = [];
+        
+        function startPractice() {
+            showScreen('screen6');
+            practiceTrialIndex = 0;
+            
+            // 创建3个练习试次
+            practiceTrials.length = 0;
+            for (let i = 0; i < 3; i++) {
+                // 随机选择分配方案
+                const proposal = dictatorProposals[Math.floor(Math.random() * dictatorProposals.length)];
+                
+                practiceTrials.push({
+                    ...proposal,
+                    trialId: i + 1,
+                    isPractice: true,
+                    imageGroup: 'practice',
+                    imageGroupName: 'practice'
+                });
+            }
+            
+            runPracticeTrial(0);
+        }
+        
+        function runPracticeTrial(trialIndex) {
+            practiceTrialIndex = trialIndex;
+            
+            // 显示注视点
+            document.getElementById('practice-fixation').style.display = 'flex';
+            document.getElementById('practice-proposal-choice').style.display = 'none';
+            document.getElementById('practice-feedback').style.display = 'none';
+            document.getElementById('practice-fairness-rating').style.display = 'none';
+            
+            // 重置公平性评分
+            document.querySelectorAll('input[name="practice-fairness"]').forEach(radio => {
+                radio.checked = false;
+            });
+            
+            // 存储练习试次开始时间
+            experimentData.currentPracticeTrialStart = new Date();
+            
+            // 注视点显示500ms
+            setTimeout(() => {
+                document.getElementById('practice-fixation').style.display = 'none';
+                
+                // 显示白色屏幕（练习阶段）
+                document.getElementById('image-presentation').style.display = 'flex';
+                document.getElementById('image-presentation').classList.add('white-screen');
+                document.getElementById('trial-image').style.display = 'none';
+                document.getElementById('practice-text').style.display = 'block';
+                
+                // 白色屏幕显示2000ms
+                setTimeout(() => {
+                    // 隐藏白色屏幕
+                    document.getElementById('image-presentation').style.display = 'none';
+                    document.getElementById('image-presentation').classList.remove('white-screen');
+                    document.getElementById('practice-text').style.display = 'none';
+                    
+                    // 白屏500ms
+                    setTimeout(() => {
+                        document.getElementById('practice-proposal-choice').style.display = 'block';
+                    }, 500);
+                }, 2000);
+            }, 500);
+        }
+        
+        function practiceChoice(choice) {
+            // 查找对应的分配方案
+            const proposal = dictatorProposals.find(p => p.choice === choice);
+            if (!proposal) return;
+            
+            let feedbackText = `您选择：您得${proposal.self}元，对方得${proposal.other}元`;
+            
+            document.getElementById('practice-feedback-text').textContent = feedbackText;
+            document.getElementById('practice-proposal-choice').style.display = 'none';
+            document.getElementById('practice-feedback').style.display = 'block';
+            
+            // 记录决策和反应时间
+            const reactionTime = new Date() - experimentData.currentPracticeTrialStart;
+            
+            // 存储练习试次数据
+            experimentData.practiceTrials.push({
+                trialIndex: practiceTrialIndex,
+                proposal: proposal,
+                choice: choice,
+                choiceCode: choice,
+                reactionTime: reactionTime,
+                timestamp: new Date()
+            });
+            
+            // 反馈显示1000ms后显示公平性评分
+            setTimeout(() => {
+                document.getElementById('practice-feedback').style.display = 'none';
+                document.getElementById('practice-fairness-rating').style.display = 'block';
+            }, 1000);
+        }
+        
+        // 练习阶段公平性评分键盘支持
+        function practiceRateFairness(rating) {
+            const radio = document.querySelector(`input[name="practice-fairness"][value="${rating}"]`);
+            if (radio) {
+                radio.checked = true;
+            }
+        }
+        
+        function nextPracticeTrial() {
+            // 获取公平性评分
+            const selectedFairness = document.querySelector('input[name="practice-fairness"]:checked');
+            if (!selectedFairness) {
+                alert('请选择公平性评分');
+                return;
+            }
+            
+            // 记录公平性评分
+            if (experimentData.practiceTrials.length > 0) {
+                experimentData.practiceTrials[experimentData.practiceTrials.length - 1].fairness = parseInt(selectedFairness.value);
+            }
+            
+            // 检查是否所有练习试次都已完成
+            if (practiceTrialIndex < practiceTrials.length - 1) {
+                runPracticeTrial(practiceTrialIndex + 1);
+            } else {
+                // 练习结束
+                showScreen('screen7');
+            }
+        }
+        
+        // 重新开始练习
+        function restartPractice() {
+            // 清空练习数据
+            experimentData.practiceTrials = [];
+            practiceTrialIndex = 0;
+            
+            // 重新开始练习
+            startPractice();
+        }
+        
+        function startExperiment() {
+            // 记录正式实验开始时间
+            experimentData.formalExperimentStartTime = new Date();
+            showScreen('screen8');
+            runTrial(0);
+        }
+        
+        function runTrial(trialIndex) {
+            experimentData.currentTrial = trialIndex;
+            const trial = experimentData.trialSequence[trialIndex];
+            
+            // 更新进度和计数器
+            document.getElementById('progress-bar').style.width = `${(trialIndex + 1) / experimentData.trialSequence.length * 100}%`;
+            document.getElementById('trial-counter').textContent = `试次 ${trialIndex + 1} / ${experimentData.trialSequence.length}`;
+            
+            // 更新图片
+            document.getElementById('trial-image').src = trial.imagePath;
+            document.getElementById('trial-image').alt = `实验图片 ${trial.imageGroupName}`;
+            document.getElementById('trial-image').style.display = 'block';
+            document.getElementById('practice-text').style.display = 'none';
+            
+            // 重置公平性评分
+            document.querySelectorAll('input[name="fairness"]').forEach(radio => {
+                radio.checked = false;
+            });
+            
+            // 显示注视点
+            document.getElementById('fixation').style.display = 'flex';
+            document.getElementById('proposal-choice').style.display = 'none';
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('fairness-rating').style.display = 'none';
+            
+            // 存储试次开始时间
+            experimentData.currentTrialStart = new Date();
+            
+            // 注视点显示500ms
+            setTimeout(() => {
+                document.getElementById('fixation').style.display = 'none';
+                
+                // 显示全屏图片
+                document.getElementById('image-presentation').style.display = 'flex';
+                document.getElementById('image-presentation').classList.remove('white-screen');
+                
+                // 图片显示2000ms
+                setTimeout(() => {
+                    // 隐藏图片
+                    document.getElementById('image-presentation').style.display = 'none';
+                    
+                    // 白屏500ms
+                    setTimeout(() => {
+                        document.getElementById('proposal-choice').style.display = 'block';
+                    }, 500);
+                }, 2000);
+            }, 500);
+        }
+        
+        function makeChoice(choice) {
+            const trialIndex = experimentData.currentTrial;
+            const currentTrialInfo = experimentData.trialSequence[trialIndex];
+            
+            // 查找对应的分配方案
+            const proposal = dictatorProposals.find(p => p.choice === choice);
+            if (!proposal) return;
+            
+            let feedbackText = `您选择：您得${proposal.self}元，对方得${proposal.other}元`;
+            
+            document.getElementById('trial-feedback').textContent = feedbackText;
+            document.getElementById('proposal-choice').style.display = 'none';
+            document.getElementById('feedback').style.display = 'block';
+            
+            // 记录决策和反应时间
+            const reactionTime = new Date() - experimentData.currentTrialStart;
+            
+            // 存储试次数据 - 修复：保存完整的试次信息
+            experimentData.trials.push({
+                trialIndex: trialIndex,
+                originalIndex: currentTrialInfo.originalIndex,
+                sequenceIndex: currentTrialInfo.sequenceIndex,
+                imageGroup: currentTrialInfo.imageGroup,
+                imageGroupName: currentTrialInfo.imageGroupName,
+                imageGroupCode: currentTrialInfo.imageGroupCode,
+                imagePath: currentTrialInfo.imagePath,
+                proposalSelf: proposal.self,
+                proposalOther: proposal.other,
+                proposalChoice: proposal.choice,
+                proposalType: proposal.type,
+                choice: choice,
+                choiceCode: choice,
+                reactionTime: reactionTime,
+                timestamp: new Date()
+            });
+            
+            // 反馈显示1000ms后显示公平性评分
+            setTimeout(() => {
+                document.getElementById('feedback').style.display = 'none';
+                document.getElementById('fairness-rating').style.display = 'block';
+            }, 1000);
+        }
+        
+        // 公平性评分键盘支持
+        function rateFairness(rating) {
+            const radio = document.querySelector(`input[name="fairness"][value="${rating}"]`);
+            if (radio) {
+                radio.checked = true;
+            }
+        }
+        
+        function nextTrial() {
+            // 获取公平性评分
+            const selectedFairness = document.querySelector('input[name="fairness"]:checked');
+            if (!selectedFairness) {
+                alert('请选择公平性评分');
+                return;
+            }
+            
+            // 记录公平性评分
+            if (experimentData.trials.length > 0) {
+                experimentData.trials[experimentData.trials.length - 1].fairness = parseInt(selectedFairness.value);
+            }
+            
+            // 检查是否所有试次都已完成
+            if (experimentData.currentTrial < experimentData.trialSequence.length - 1) {
+                // 检查是否是第20个试次（索引19）
+                if (experimentData.currentTrial === 19) {
+                    // 记录正式实验前20个试次结束时间
+                    experimentData.formalExperimentMidTime = new Date();
+                    // 显示休息屏幕
+                    showScreen('screen9');
+                } else {
+                    runTrial(experimentData.currentTrial + 1);
+                }
+            } else {
+                // 所有试次完成，记录正式实验结束时间
+                experimentData.formalExperimentEndTime = new Date();
+                // 计算正式实验时长（秒）
+                experimentData.formalExperimentDuration = Math.round((experimentData.formalExperimentEndTime - experimentData.formalExperimentStartTime) / 1000);
+                // 进入理解测试
+                showComprehensionTest();
+            }
+        }
+        
+        function showComprehensionTest() {
+            showScreen('screen10');
+        }
+        
+        function checkComprehension() {
+            const q1Answer = document.querySelector('input[name="q1"]:checked');
+            const q2Answer = document.querySelector('input[name="q2"]:checked');
+            
+            if (!q1Answer || !q2Answer) {
+                alert('请回答所有问题');
+                return;
+            }
+            
+            // 记录答案并检查正确性
+            experimentData.comprehension.q1 = q1Answer.value;
+            experimentData.comprehension.q2 = q2Answer.value;
+            // 修改后的正确答案：第一题B（提议者），第二题B（方案生效）
+            experimentData.comprehension.q1Correct = (q1Answer.value === 'B');
+            experimentData.comprehension.q2Correct = (q2Answer.value === 'B');
+            
+            // 增加尝试次数
+            experimentData.comprehension.attempts++;
+            
+            // 检查是否通过
+            if (experimentData.comprehension.q1Correct && experimentData.comprehension.q2Correct) {
+                // 通过测试
+                showUncertaintyToleranceQuestionnaire();
+            } else {
+                // 未通过测试
+                if (experimentData.comprehension.attempts === 1) {
+                    // 第一次失败
+                    alert('您未能正确回答所有问题，请仔细阅读实验说明后重新作答。');
+                    document.getElementById('comprehension-failed').style.display = 'block';
+                } else {
+                    // 第二次失败
+                    alert('您已两次未能通过理解测试，请重新阅读实验说明。');
+                    showScreen('screen3');
+                }
+            }
+        }
+        
+        function retryComprehension() {
+            // 重置答案
+            document.querySelectorAll('input[name="q1"]').forEach(radio => {
+                radio.checked = false;
+            });
+            document.querySelectorAll('input[name="q2"]').forEach(radio => {
+                radio.checked = false;
+            });
+            
+            // 隐藏失败提示
+            document.getElementById('comprehension-failed').style.display = 'none';
+        }
+        
+        function showUncertaintyToleranceQuestionnaire() {
+            showScreen('screen11');
+        }
+        
+        function saveQuestionnaire() {
+            // 收集不确定性容忍度量表数据
+            for (let i = 1; i <= 12; i++) {
+                const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
+                if (!selectedOption) {
+                    alert(`请回答第${i}题`);
+                    return;
+                }
+                experimentData.uncertaintyTolerance[`q${i}`] = parseInt(selectedOption.value);
+            }
+            
+            showScreen('screen12');
+        }
+        
+        // 切换其他地点输入框的显示
+        function toggleOtherLocation() {
+            const locationSelect = document.getElementById('location');
+            const otherLocationInput = document.getElementById('other-location-input');
+            
+            if (locationSelect.value === '其他') {
+                otherLocationInput.style.display = 'block';
+            } else {
+                otherLocationInput.style.display = 'none';
+            }
+        }
+        
+        // 保存作答地点和环境评估数据
+        function saveLocation() {
+            const locationSelect = document.getElementById('location');
+            const otherLocationInput = document.getElementById('other-location');
+            
+            if (!locationSelect.value) {
+                alert('请选择您的作答地点');
+                return;
+            }
+            
+            if (locationSelect.value === '其他') {
+                if (!otherLocationInput.value) {
+                    alert('请填写您的作答地点');
+                    return;
+                }
+                experimentData.location = otherLocationInput.value;
+            } else {
+                experimentData.location = locationSelect.value;
+            }
+            
+            // 收集到陌生地方频率数据
+            const frequency = document.querySelector('input[name="unfamiliarFrequency"]:checked');
+            if (!frequency) {
+                alert('请选择您到陌生地方的频率');
+                return;
+            }
+            experimentData.unfamiliarFrequency = frequency.value;
+            
+            // 收集环境评估数据
+            const familiarity = document.querySelector('input[name="familiarity"]:checked');
+            const pleasure = document.querySelector('input[name="pleasure"]:checked');
+            const arousal = document.querySelector('input[name="arousal"]:checked');
+            
+            if (!familiarity || !pleasure || !arousal) {
+                alert('请完成环境评估量表');
+                return;
+            }
+            
+            experimentData.environmentAssessment = {
+                familiarity: parseInt(familiarity.value),
+                pleasure: parseInt(pleasure.value),
+                arousal: parseInt(arousal.value)
+            };
+            
+            showScreen('screen13');
+        }
+        
+        // 生成CSV数据 - 修复后的版本
+        function generateCSV() {
+            // 计算实验总时间
+            experimentData.endTime = new Date();
+            experimentData.totalTime = Math.round((experimentData.endTime - experimentData.startTime) / 1000 / 60);
+            
+            // 英文列标题
+            let csvContent = "participant_id,age,gender,major,education,health_status,location,unfamiliar_frequency,environment_familiarity,environment_pleasure,environment_arousal,matched_participant,comprehension_q1_answer,comprehension_q1_correct,comprehension_q2_answer,comprehension_q2_correct,comprehension_attempts,total_time_minutes,formal_experiment_duration_seconds,break_choice,trial,image_group,image_group_code,image_file,choice,choice_code,proposal_self,proposal_other,proposal_type,reaction_time_ms,fairness_rating,timestamp";
+            
+            // 添加不确定性容忍度量表标题
+            for (let i = 1; i <= 12; i++) {
+                csvContent += `,uncertainty_tolerance_${i}`;
+            }
+            
+            csvContent += "\n";
+            
+            // 按照原始索引顺序生成CSV行
+            // 首先对试次数据按照原始索引排序
+            const sortedTrials = [...experimentData.trials].sort((a, b) => a.originalIndex - b.originalIndex);
+            
+            sortedTrials.forEach(trial => {
+                let row = `"${experimentData.participantId}","${experimentData.demographics.age}","${experimentData.demographics.gender}","${experimentData.demographics.major}","${experimentData.demographics.education}","${experimentData.demographics.health}","${experimentData.location}","${experimentData.unfamiliarFrequency}","${experimentData.environmentAssessment.familiarity}","${experimentData.environmentAssessment.pleasure}","${experimentData.environmentAssessment.arousal}","${experimentData.matchedParticipant}","${experimentData.comprehension.q1}","${experimentData.comprehension.q1Correct}","${experimentData.comprehension.q2}","${experimentData.comprehension.q2Correct}","${experimentData.comprehension.attempts}","${experimentData.totalTime}","${experimentData.formalExperimentDuration}","${experimentData.breakChoice}","${trial.originalIndex + 1}","${trial.imageGroupName}","${trial.imageGroupCode}","${trial.imagePath}","${trial.choice}","${trial.choiceCode}","${trial.proposalSelf}","${trial.proposalOther}","${trial.proposalType}","${trial.reactionTime}","${trial.fairness || ''}","${trial.timestamp}"`;
+                
+                // 添加不确定性容忍度量表数据
+                for (let i = 1; i <= 12; i++) {
+                    row += `,"${experimentData.uncertaintyTolerance[`q${i}`] || ''}"`;
+                }
+                
+                row += "\n";
+                csvContent += row;
+            });
+            
+            return csvContent;
+        }
+        
+        // 下载CSV文件
+        function downloadData() {
+            const csvContent = generateCSV();
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            
+            link.setAttribute("href", url);
+            const filename = `${experimentData.participantId}_${experimentData.startTime.toISOString().slice(0,19).replace(/:/g,'-')}.csv`;
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // 显示下载成功状态
+            document.getElementById('download-status').style.display = 'block';
+            
+            // 延迟后自动跳转到最终完成页面
+            setTimeout(() => {
+                showScreen('screen14');
+            }, 2000);
+        }
+        
+        // 重新开始实验
+        function restartExperiment() {
+            // 重置实验数据
+            experimentData.participantId = '';
+            experimentData.demographics = {
+                age: '',
+                gender: '',
+                major: '',
+                education: '',
+                health: ''
+            };
+            experimentData.comprehension = {
+                q1: '',
+                q2: '',
+                q1Correct: false,
+                q2Correct: false,
+                attempts: 0
+            };
+            experimentData.uncertaintyTolerance = {};
+            experimentData.location = '';
+            experimentData.unfamiliarFrequency = '';
+            experimentData.environmentAssessment = {
+                familiarity: '',
+                pleasure: '',
+                arousal: ''
+            };
+            experimentData.matchedParticipant = 0;
+            experimentData.practiceTrials = [];
+            experimentData.trials = [];
+            experimentData.currentTrial = 0;
+            experimentData.startTime = null;
+            experimentData.endTime = null;
+            experimentData.totalTime = 0;
+            experimentData.formalExperimentStartTime = null;
+            experimentData.formalExperimentEndTime = null;
+            experimentData.formalExperimentDuration = 0;
+            experimentData.breakChoice = 0;
+            experimentData.trialSequence = [];
+            
+            // 回到第一个屏幕
+            showScreen('screen1');
+            document.getElementById('participant-id').value = '';
+            document.getElementById('download-status').style.display = 'none';
+        }
+        
+        // 重置不活动计时器
+        function resetInactivityTimer() {
+            experimentData.lastActivityTime = new Date();
+            
+            // 清除现有的计时器
+            if (experimentData.inactivityTimer) {
+                clearTimeout(experimentData.inactivityTimer);
+            }
+            
+            // 设置新的计时器（2分钟 = 120000毫秒）
+            experimentData.inactivityTimer = setTimeout(() => {
+                // 检查当前屏幕是否需要监控不活动状态
+                const currentScreen = document.querySelector('.screen.active');
+                if (currentScreen && (
+                    currentScreen.id === 'screen6' ||
+                    currentScreen.id === 'screen8' ||
+                    currentScreen.id === 'screen10' ||
+                    currentScreen.id === 'screen11'
+                )) {
+                    alert('您已超过两分钟未进行作答，请您立即作答！否则本次实验即关闭。');
+                    // 重置计时器
+                    resetInactivityTimer();
+                }
+            }, 120000);
+        }
+        
+        // 键盘事件监听
+        document.addEventListener('keydown', function(event) {
+            // 重置不活动计时器
+            resetInactivityTimer();
+            
+            const activeScreen = document.querySelector('.screen.active');
+            const activeScreenId = activeScreen ? activeScreen.id : '';
+            
+            // F11键切换全屏（始终允许）
+            if (event.key === 'F11') {
+                event.preventDefault();
+                // 在屏幕14允许退出全屏
+                if (activeScreenId === 'screen14') {
+                    toggleFullscreen();
+                } else {
+                    forceFullscreen();
+                }
+                return;
+            }
+            
+            // 屏幕1：按空格键开始实验说明
+            if (activeScreenId === 'screen1' && event.key === ' ') {
+                requestFullscreenAndShowDemographics();
+            }
+            
+            // 屏幕3：按空格键开始网络连接
+            if (activeScreenId === 'screen3' && event.key === ' ') {
+                startNetwork();
+            }
+            
+            // 屏幕5：按空格键开始练习
+            if (activeScreenId === 'screen5' && event.key === ' ') {
+                startPractice();
+            }
+            
+            // 练习阶段的按键
+            if (activeScreenId === 'screen6') {
+                // 练习选择阶段
+                if (document.getElementById('practice-proposal-choice').style.display === 'block') {
+                    if (event.key >= '1' && event.key <= '5') {
+                        practiceChoice(parseInt(event.key));
+                    }
+                }
+                
+                // 练习公平性评分阶段按键1-7
+                if (document.getElementById('practice-fairness-rating').style.display === 'block') {
+                    if (event.key >= '1' && event.key <= '7') {
+                        practiceRateFairness(event.key);
+                    } else if (event.key === ' ') {
+                        nextPracticeTrial();
+                    }
+                }
+            }
+            
+            // 练习结束屏幕
+            if (activeScreenId === 'screen7' && event.key === ' ') {
+                startExperiment();
+            }
+            
+            // 休息屏幕按空格键跳过
+            if (activeScreenId === 'screen9' && event.key === ' ') {
+                skipBreak();
+            }
+            
+            // 理解测试阶段按空格键提交
+            if (activeScreenId === 'screen10' && event.key === ' ') {
+                checkComprehension();
+            }
+            
+            // 正式实验选择阶段的按键
+            if (activeScreenId === 'screen8') {
+                if (document.getElementById('proposal-choice').style.display === 'block') {
+                    if (event.key >= '1' && event.key <= '5') {
+                        makeChoice(parseInt(event.key));
+                    }
+                }
+                
+                // 公平性评分阶段按键1-7
+                if (document.getElementById('fairness-rating').style.display === 'block') {
+                    if (event.key >= '1' && event.key <= '7') {
+                        rateFairness(event.key);
+                    } else if (event.key === ' ') {
+                        nextTrial();
+                    }
+                }
+            }
+            
+            // 不确定性容忍度量表按空格键提交
+            if (activeScreenId === 'screen11' && event.key === ' ') {
+                saveQuestionnaire();
+            }
+            
+            // 作答地点选择页面按空格键提交
+            if (activeScreenId === 'screen12' && event.key === ' ') {
+                saveLocation();
+            }
+            
+            // 屏幕13按空格键下载数据
+            if (activeScreenId === 'screen13' && event.key === ' ') {
+                downloadData();
+            }
+            
+            // 屏幕14按空格键退出全屏
+            if (activeScreenId === 'screen14' && event.key === ' ') {
+                exitFullscreen();
+            }
+        });
+        
+        // 鼠标活动监听
+        document.addEventListener('mousedown', resetInactivityTimer);
+        document.addEventListener('mousemove', resetInactivityTimer);
+        
+        // 全屏变化监听
+        document.addEventListener('fullscreenchange', function() {
+            // 检查当前屏幕，如果是屏幕14则不显示警告
+            const currentScreen = document.querySelector('.screen.active');
+            if (currentScreen && currentScreen.id === 'screen14') {
+                document.getElementById('fullscreen-overlay').style.display = 'none';
+                document.getElementById('fullscreen-warning').style.display = 'none';
+                experimentData.fullscreenWarningShown = false;
+                return;
+            }
+            checkFullscreen();
+        });
+        
+        document.addEventListener('webkitfullscreenchange', function() {
+            const currentScreen = document.querySelector('.screen.active');
+            if (currentScreen && currentScreen.id === 'screen14') {
+                document.getElementById('fullscreen-overlay').style.display = 'none';
+                document.getElementById('fullscreen-warning').style.display = 'none';
+                experimentData.fullscreenWarningShown = false;
+                return;
+            }
+            checkFullscreen();
+        });
+        
+        document.addEventListener('mozfullscreenchange', function() {
+            const currentScreen = document.querySelector('.screen.active');
+            if (currentScreen && currentScreen.id === 'screen14') {
+                document.getElementById('fullscreen-overlay').style.display = 'none';
+                document.getElementById('fullscreen-warning').style.display = 'none';
+                experimentData.fullscreenWarningShown = false;
+                return;
+            }
+            checkFullscreen();
+        });
+        
+        document.addEventListener('MSFullscreenChange', function() {
+            const currentScreen = document.querySelector('.screen.active');
+            if (currentScreen && currentScreen.id === 'screen14') {
+                document.getElementById('fullscreen-overlay').style.display = 'none';
+                document.getElementById('fullscreen-warning').style.display = 'none';
+                experimentData.fullscreenWarningShown = false;
+                return;
+            }
+            checkFullscreen();
+        });
+        
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化不活动计时器
+            resetInactivityTimer();
+        });
+        
+        // 页面卸载时清理
+        window.addEventListener('beforeunload', function() {
+            if (experimentData.inactivityTimer) {
+                clearTimeout(experimentData.inactivityTimer);
+            }
+            if (experimentData.breakTimer) {
+                clearInterval(experimentData.breakTimer);
+            }
+        });
+    </script>
+</body>
+</html>
