@@ -1273,6 +1273,44 @@
             text-align: center;
         }
         
+        /* 新增：练习阶段决策容器优化样式 */
+        #screen6 .practice-decision-container {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+        
+        #screen6 .allocation-and-punishment {
+            min-height: 500px;
+            align-items: stretch;
+        }
+        
+        #screen6 .allocation-section,
+        #screen6 .punishment-section {
+            min-height: 450px;
+            justify-content: space-between;
+        }
+        
+        #screen6 .punishment-options {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        #screen6 .punishment-option {
+            height: 110px;
+            padding: 10px;
+            justify-content: space-around;
+        }
+        
+        #screen6 .punishment-key {
+            font-size: 2rem;
+        }
+        
+        #screen6 .punishment-details {
+            font-size: 0.9rem;
+        }
+        
         @media (max-width: 1200px) {
             h1 {
                 font-size: 1.8rem;
@@ -1361,6 +1399,20 @@
             .fairness-allocation-display {
                 font-size: 1.2rem;
                 padding: 12px;
+            }
+            
+            /* 练习阶段响应式调整 */
+            #screen6 .practice-decision-container {
+                max-height: 65vh;
+            }
+            
+            #screen6 .allocation-and-punishment {
+                min-height: 450px;
+            }
+            
+            #screen6 .allocation-section,
+            #screen6 .punishment-section {
+                min-height: 400px;
             }
         }
         
@@ -1515,6 +1567,41 @@
             .fairness-allocation-display {
                 font-size: 1.1rem;
                 padding: 10px;
+            }
+            
+            /* 练习阶段移动端调整 */
+            #screen6 .practice-decision-container {
+                max-height: 60vh;
+                padding: 5px 0;
+            }
+            
+            #screen6 .allocation-and-punishment {
+                min-height: 400px;
+                gap: 15px;
+            }
+            
+            #screen6 .allocation-section,
+            #screen6 .punishment-section {
+                min-height: 350px;
+                padding: 10px;
+            }
+            
+            #screen6 .punishment-options {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            
+            #screen6 .punishment-option {
+                height: 95px;
+                padding: 8px 5px;
+            }
+            
+            #screen6 .punishment-key {
+                font-size: 1.8rem;
+            }
+            
+            #screen6 .punishment-details {
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -1693,20 +1780,7 @@
                                 </ul>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="key-instruction" style="margin-top: 20px;">
-                        <p><strong>操作说明：</strong></p>
-                        <p>在练习和正式实验中，请使用键盘数字键进行作答：</p>
-                        <p>按 <kbd>0</kbd> 键：选择花费0代币惩罚A（不惩罚）</p>
-                        <p>按 <kbd>1</kbd> 键：选择花费10代币惩罚A</p>
-                        <p>按 <kbd>2</kbd> 键：选择花费20代币惩罚A</p>
-                        <p>按 <kbd>3</kbd> 键：选择花费30代币惩罚A</p>
-                        <p>按 <kbd>4</kbd> 键：选择花费40代币惩罚A</p>
-                        <p>按 <kbd>5</kbd> 键：选择花费50代币惩罚A</p>
-                        <p>按 <kbd>空格键</kbd>：继续下一试次</p>
-                    </div>
-                    
+                    </div> 
                     <div style="margin-top: 15px;">
                         <p class="centered-message">如果您已完全理解上述规则且同意开始实验，请点击下方按钮开始练习环节，以熟悉操作流程。</p>
                         <button class="btn" onclick="startNetwork()">理解，继续</button>
@@ -1758,7 +1832,7 @@
                         <div class="cross">+</div>
                     </div>
                     
-                    <!-- 分配方案和惩罚选择在同一页面 -->
+                    <!-- 分配方案和惩罚选择在同一页面 - 修改为与正式实验一致的结构 -->
                     <div id="practice-decision" class="decision-container" style="display: none;">
                         <div class="allocation-and-punishment">
                             <div class="allocation-section">
@@ -3074,13 +3148,16 @@
                     document.getElementById('image-presentation').classList.remove('white-screen');
                     document.getElementById('practice-text').style.display = 'none';
                     
-                    // 显示分配方案和惩罚选择页面
+                    // 显示分配方案和惩罚选择页面 - 与正式实验完全一致的结构
                     document.getElementById('practice-allocation-text').innerHTML = `
                         A提出分配方案：<br>
                         <span class="allocation-A">A：${trial.A}</span> 代币<br>
                         <span class="allocation-B">B：${trial.B}</span> 代币
                     `;
                     document.getElementById('practice-decision').style.display = 'block';
+                    
+                    // 确保页面滚动到顶部
+                    window.scrollTo(0, 0);
                 }, 2000);
             }, 500);
         }
